@@ -1,130 +1,169 @@
 import numpy as np
 import pandas as pd
-import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-import matplotlib.gridspec as gridspec
+import plot_cd_diagram
 
-r = pd.read_csv('cv_results.csv')
-# r.set_index('Dataset', inplace=True)
-print(r.shape[0])
+import subprocess
+import glob
 
-folds = [10]
-patience = [0, 5]
+import os
+import experiments_helper
 
-BAR_SEPARATION = 0.8
-GROUP_SEPARATION = 0.2
+from pgmpy.models import HybridContinuousModel
+from pgmpy.factors.continuous import NodeType
 
-COLOR1 = "#B5EA7F"
-COLOR2 = "#739DF6"
-COLOR3 = "#00000080"
-COLOR4 = "#E3E971"
+import tikzplotlib
 
-DATASETS_PER_ROW = 5
+def plot_cd_diagrams(rename_dict):
+    df_bn = pd.read_csv('cv_results_bn.csv')
+    df_gmm = pd.read_csv('cv_results_gmm.csv')
+    df_kde = pd.read_csv('cv_results_kde.csv')
+    df_kdebn = pd.read_csv('cv_results_kdenetwork.csv')
 
-def draw_dfs(partial_df, image_name):
-    n_datasets = min(partial_df.shape[0], DATASETS_PER_ROW)
+    df_bn = df_bn.loc[:, ['Dataset', 'CKDE_Validation_10_0', 'CKDE_Validation_10_5', 'Gaussian_Validation_10_0',
+                          'Gaussian_Validation_10_5', 'BIC', 'BGe']]
 
-    fig, axs = plt.subplots(1, n_datasets, sharex=True, squeeze=False)
-    fig.set_figheight(5)
-    fig.set_figwidth(16)
+    df_bn = df_bn.set_index('Dataset')
+    df_gmm = df_gmm.set_index('Dataset')
+    df_kde = df_kde.set_index('Dataset')
+    df_kdebn = df_kdebn.set_index('Dataset')
 
-    for (idx, (i, row)) in enumerate(partial_df.iterrows()):
-        n_validation_bars = len(folds) * len(patience)
+    # df_concat = pd.concat([df_bn, df_gmm], axis=1)
+    df_algorithms = df_bn.copy()
+    # df_algorithms['GMM'] = df_gmm.max(1)
+    # df_algorithms['KDE'] = df_kde.loc[:, 'KDE']
+    df_algorithms['KDEBN_0'] = df_kdebn.loc[:, 'KDEBN_Validation_10_0']
+    df_algorithms['KDEBN_5'] = df_kdebn.loc[:, 'KDEBN_Validation_10_5']
 
-        ckde_scores = [row['CKDE_Validation_' + str(f) + "_" + str(p)] for f in folds for p in patience]
-        gaussian_scores = [row['Gaussian_Validation_' + str(f) + "_" + str(p)] for f in folds for p in patience]
-        bic_score = row["BIC"]
-        bge_score = row["BGe"]
+    df_algorithms = df_algorithms.drop("Haberman", errors='ignore')
+    df_algorithms = df_algorithms.drop("Thyroid", errors='ignore')
+    df_algorithms = df_algorithms.drop("Transfusion", errors='ignore')
 
-        scores = ckde_scores + gaussian_scores + [bic_score] + [bge_score]
+    # df_algorithms = df_algorithms.drop("BGe", axis=1)
+    # df_algorithms = df_algorithms.drop("CKDE_Validation_10_0", axis=1)
+    # df_algorithms = df_algorithms.drop("Gaussian_Validation_10_0", axis=1)
+    # df_algorithms = df_algorithms.drop("KDEBN_0", axis=1)
 
-        color = [COLOR1]*n_validation_bars + [COLOR2]*n_validation_bars + [COLOR3] + [COLOR4]
+    rank = df_algorithms.rank(axis=1, ascending=False)
+    avgranks = rank.mean().to_numpy()
+    names = rank.columns.values
 
-        LENGTH_GROUP = n_validation_bars * BAR_SEPARATION
+    names = [rename_dict[s] for s in names]
 
-        xaxis = np.arange(n_validation_bars)*BAR_SEPARATION
-        xaxis = np.hstack((xaxis, LENGTH_GROUP + np.arange(n_validation_bars)*BAR_SEPARATION + GROUP_SEPARATION))
-        xaxis = np.hstack((xaxis, LENGTH_GROUP*2 + GROUP_SEPARATION*2, LENGTH_GROUP*2 + BAR_SEPARATION + GROUP_SEPARATION*3))
+    plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="cd")
+    tikzplotlib.save("plots/Nemenyi.tex", standalone=True, axis_width="12cm", axis_height="5cm")
 
-        bars = axs[0, idx].bar(xaxis, scores, color=color, linewidth=0.5, edgecolor="black")
-        axs[0, idx].set_xticks([])
-        axs[0, idx].set_title(row["Dataset"])
+    plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="holm")
+    tikzplotlib.save("plots/Holm.tex", standalone=True, axis_width="12cm", axis_height="5cm")
 
-        ymin, ymax = axs[0,idx].get_ylim()
-        ymax_abs = np.maximum(np.abs(ymin), np.abs(ymax))
-        axs[0,idx].set_ylim(-ymax_abs, ymax_abs)
-        axs[0,idx].axhline(0, linewidth=3, color='black')
+    plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="bergmann")
+    tikzplotlib.save("plots/Bergmann.tex", standalone=True, axis_width="12cm", axis_height="5cm")
 
-        axs[0,idx].spines['top'].set_visible(False)
-        axs[0,idx].spines['bottom'].set_visible(False)
-        axs[0,idx].spines['right'].set_visible(False)
-        # axs[0,idx].spines['left'].set_visible(False)
+    os.chdir("plots")
+    process = subprocess.Popen('pdflatex Nemenyi.tex'.split())
+    process.wait()
+    process = subprocess.Popen('pdflatex Holm.tex'.split())
+    process.wait()
+    process = subprocess.Popen('pdflatex Bergmann.tex'.split())
+    process.wait()
+    process = subprocess.Popen('evince Bergmann.pdf'.split())
+    process.wait()
 
-        # axs[0, idx].set_ylim(np.asarray(scores).min(), np.asarray(scores).max())
+    return df_algorithms
 
-        patterns = (None, '//', None, '//', None, None)
-        for bar, pattern in zip(bars, patterns):
-            if pattern is not None:
-                bar.set_hatch(pattern)
+def kdeness_ckde():
+    folds = [10]
+    patience = [0, 5]
 
-    COLOR1_patch = mpatches.Patch(color=COLOR1, label='SPBN')
-    COLOR2_patch = mpatches.Patch(color=COLOR2, label='GBN Validation')
-    COLOR3_patch = mpatches.Patch(color=COLOR3, label='GBN BIC')
-    COLOR4_patch = mpatches.Patch(color=COLOR4, label='GBN BGe')
+    files = experiments_helper.find_crossvalidation_datasets()
+    valid_files = [f for f in files if experiments_helper.validate_dataset(f, [2, 3, 5, 10]) is not None]
 
-    PATIENCE0_PATCH = mpatches.Patch(fill=False, label="Patience 0")
+    n_ckde = np.full((len(valid_files), len(folds), len(patience), 10), np.nan)
+    datasets = []
+    n_vars = []
+    for idx_file, file in enumerate(valid_files):
+        x = experiments_helper.validate_dataset(file, [2, 3, 5, 10])
+        dataset, result_folder = x
 
-    SPACE_PATCH = matplotlib.lines.Line2D([],[],linestyle='')
-    PATIENCE5_PATCH = mpatches.Patch(hatch='//', fill=False,  label="Patience 5")
-    # PATIENCE5_PATCH.set_hatch('////')
-    plt.legend(handles=[COLOR1_patch, COLOR2_patch, COLOR3_patch, COLOR4_patch, SPACE_PATCH,
-                        PATIENCE0_PATCH, PATIENCE5_PATCH])
+        basefolder = os.path.basename(os.path.dirname(file))
+        datasets.append(basefolder)
+        n_vars.append(dataset.shape[1])
 
-    plt.subplots_adjust(wspace=0.4, hspace=0)
-    plt.tight_layout()
-    plt.savefig(image_name, dpi=300)
-    # plt.show()
+        for idx_f, f in enumerate(folds):
+            for idx_p, p in enumerate(patience):
+                n_ckde_folds = np.empty((10,))
+                for idx_fold in range(10):
+                    models_folder = result_folder + '/CKDE/Validation_' + str(f) + "_" + str(p) + '/' + str(idx_fold)
+                    all_models = sorted(glob.glob(models_folder + '/*.pkl'))
+                    final_model = HybridContinuousModel.load_model(all_models[-1])
+
+                    n_ckde[idx_file, idx_f, idx_p, idx_fold] = \
+                        sum(map(lambda kv: kv[1] == NodeType.CKDE, final_model.node_type.items()))
+
+    mean_ckde = np.mean(n_ckde, axis=3).reshape(len(valid_files), -1)
+    names = ["CKDE_" + str(f) + "_" + str(p) for f in folds for p in patience]
+
+    df = pd.DataFrame(mean_ckde, columns=names, index=datasets)
+    df['n_vars'] = n_vars
+    for f in folds:
+        for p in patience:
+            df['%CKDE_' + str(f) + "_" + str(p)] = df.loc[:,'CKDE_' + str(f) + "_" + str(p)] / df.loc[:, 'n_vars']
+
+
+    N = df.shape[0]
+    ind = np.arange(N)
+    num_bars = len(folds) * len(patience)
+    width = (1 - 0.3) / num_bars
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    offset = 0
+
+    b = []
+    color = {0: "#729CF5", 5: "#FFB346"}
+    for f in folds:
+        for p in patience:
+            t = ax.bar(ind+width*offset, df['%CKDE_' + str(f) + "_" + str(p)].to_numpy(), width,
+                       align='edge', color=color[p])
+            offset += 1
+            b.append(t)
+
+    ax.set_ylabel('Ratio of HLNP variables')
+    ax.set_xticks(ind + (1 - 0.3) / 2)
+    ax.set_xticklabels(df.index)
+    ax.tick_params(axis='x', rotation=90)
+
+    # ax.legend(tuple([t[0] for t in b]), (r'$\lambda = 0$', r'$\lambda = 5$'))
+    plt.legend([t[0] for t in b], [r'$\lambda = 0$', r'$\lambda = 5$'])
+    tikzplotlib.save("plots/kdeness.tex", standalone=True, axis_width="25cm", axis_height="10cm")
+
+def datasets_table():
+    files = experiments_helper.find_crossvalidation_datasets()
+    valid_files = [f for f in files if experiments_helper.validate_dataset(f, [2, 3, 5, 10]) is not None]
+
+    for idx_file, file in enumerate(valid_files):
+        dataset, result_folder = experiments_helper.validate_dataset(file, [2, 3, 5, 10])
+        basefolder = os.path.basename(os.path.dirname(file))
+
+        print(basefolder + " " + str(dataset.shape[0]) + "x" + str(dataset.shape[1]))
+
 
 
 if __name__ == '__main__':
-    for idx, partial_df in enumerate(r.loc[i:i + DATASETS_PER_ROW - 1, :] for i in range(0, r.shape[0], DATASETS_PER_ROW)):
-        draw_dfs(partial_df, "results" + str(idx) + ".pdf")
+    # rename_dict = {
+    #     'CKDE_Validation_10_0': r'SPBN $\lambda = 0$',
+    #     'CKDE_Validation_10_5': r'SPBN $\lambda = 5$',
+    #     'Gaussian_Validation_10_0': r'GBN $\lambda = 0$',
+    #     'Gaussian_Validation_10_5': r'GBN $\lambda = 5$',
+    #     'BIC': r'GBN BIC',
+    #     'BGe': r'GBN BGe',
+    #     'KDEBN_0': r'KDEBN $\lambda = 0$',
+    #     'KDEBN_5': r'KDEBN $\lambda = 5$',
+    # }
+    # latex = plot_cd_diagrams(rename_dict)
 
+    df = kdeness_ckde()
+    print(df)
 
-# def
-
-# fig, axs = plt.subplots(1, 5, sharex=True)
-#
-#
-# for (i, row) in r.iterrows():
-#     if i != 'Block':
-#         continue
-#     n_validation = len(folds) * len(patience)
-#
-#     ckde_scores = [row['CKDE_Validation_' + str(f) + "_" + str(p)] for f in folds for p in patience]
-#     gaussian_scores = [row['Gaussian_Validation_' + str(f) + "_" + str(p)] for f in folds for p in patience]
-#     bic_score = row["BIC"]
-#     bge_score = row["BGe"]
-#
-#     scores = ckde_scores + gaussian_scores + [bic_score] + [bge_score]
-#
-#     color = [COLOR1]*n_validation + [COLOR2]*n_validation + [COLOR3] + [COLOR4]
-#
-#     LENGTH_GROUP = n_validation * BAR_SEPARATION
-#
-#     xaxis = np.arange(n_validation)*BAR_SEPARATION
-#     xaxis = np.hstack((xaxis, LENGTH_GROUP + np.arange(n_validation)*BAR_SEPARATION + GROUP_SEPARATION))
-#     xaxis = np.hstack((xaxis, LENGTH_GROUP*2 + GROUP_SEPARATION*2, LENGTH_GROUP*2 + BAR_SEPARATION + GROUP_SEPARATION*3))
-#
-#     print(xaxis)
-#     bars = axs[0].bar(xaxis, scores, color=color, linewidth=0.5, edgecolor="black")
-#     axs[0].set_xticks([])
-#
-#     patterns = (None, '//', None, '//', None, None)
-#     for bar, pattern in zip(bars, patterns):
-#         if pattern is not None:
-#             bar.set_hatch(pattern)
-#
-# plt.subplots_adjust(wspace=0.2, hspace=0)
-# plt.show()
+    # datasets_table()

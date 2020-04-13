@@ -13,74 +13,7 @@ from sklearn.model_selection import KFold
 import pathlib
 
 import multiprocessing as mp
-
-def find_crossvalidation_datasets():
-    csv_files = glob.glob('data/**/*.csv')
-
-    csv_files = list(filter(lambda n: not os.path.splitext(os.path.basename(n))[0].endswith("_full"), csv_files))
-    csv_files = list(filter(lambda n: not os.path.splitext(os.path.basename(n))[0].endswith("_tra"), csv_files))
-    csv_files = list(filter(lambda n: not os.path.splitext(os.path.basename(n))[0].endswith("_tes"), csv_files))
-
-    csv_files = sorted(csv_files)
-    return csv_files
-
-
-def find_hold_out_datasets():
-    csv_files = glob.glob('data/**/*.csv')
-
-    tra_files = list(filter(lambda n: os.path.splitext(os.path.basename(n))[0].endswith("_tra"), csv_files))
-    tes_files = list(filter(lambda n: os.path.splitext(os.path.basename(n))[0].endswith("_tes"), csv_files))
-
-    set_tra = set([f[:-4] for f in tra_files])
-    set_tes = set([f[:-4] for f in tes_files])
-
-    if set_tra != set_tes:
-        raise FileNotFoundError("The test/training files did not match.\nTraining files: " + str(tra_files)
-                                + "\nTest files: " + str(tes_files))
-
-    tra_files = sorted(tra_files)
-    tes_files = sorted(tes_files)
-    return tra_files, tes_files
-
-
-def make_beep():
-    duration = 1  # seconds
-    freq = 400  # Hz
-    os.system('play -nq -t alsa synth {} sine {}'.format(duration, freq))
-
-
-def remove_crossvalidated_nan(dataset, folds):
-    to_delete = set()
-
-    # Outer for: Performance CV
-    for (idx_fold, (train_indices, test_indices)) in enumerate(KFold(10, shuffle=True, random_state=0).split(dataset)):
-        train_data = dataset.iloc[train_indices,:]
-        # Inner for: Validation CV
-        for k in folds:
-            vl = ValidationLikelihood(train_data, k=k, seed=0)
-            for (validation_train_indices, _) in vl.fold_indices:
-                cv_data = train_data.iloc[validation_train_indices, :]
-                d = cv_data.columns[np.isclose(cv_data.var(), 0)].tolist()
-                to_delete.update(d)
-
-    return to_delete
-
-
-def linear_dependent_features(dataset):
-    to_remove = set()
-    rank = np.linalg.matrix_rank(dataset)
-    min_dim = min(dataset.shape[0], dataset.shape[1])
-
-    tmp_dataset = dataset.copy()
-    for i in range(min_dim - rank):
-        for column in tmp_dataset.columns:
-            cpy = tmp_dataset.drop(column, axis=1)
-            if np.linalg.matrix_rank(cpy) == rank:
-                to_remove.add(column)
-                tmp_dataset = cpy
-                break
-
-    return to_remove
+import experiments_helper
 
 
 def run_validation_ckde(train_data, folds, patience, result_folder, idx_fold):
@@ -96,19 +29,7 @@ def run_validation_ckde(train_data, folds, patience, result_folder, idx_fold):
             hc = HybridCachedHillClimbing(train_data, scoring_method=vl)
             cb_draw = DrawModel(fold_folder)
             cb_save = SaveModel(fold_folder)
-
-            execution_finished = False
-            while not execution_finished:
-                try:
-                    bn = hc.estimate(callbacks=[cb_draw, cb_save], patience=p)
-                    execution_finished = True
-                except ValueError as e:
-                    from datetime import datetime
-                    with open('errors.log', 'a') as f:
-                        f.write("[" + str(datetime.now()) + ", Validation_" + str(k) + "_" + str(p) +
-                                " " + str(idx_fold) + " fold] " + str(e) + '\n')
-                    make_beep()
-
+            bn = hc.estimate(callbacks=[cb_draw, cb_save], patience=p)
             with open(fold_folder + '/end.lock', 'w') as f:
                 pass
 
@@ -144,7 +65,6 @@ def run_validation_gaussian(train_data, folds, patience, result_folder, idx_fold
             cb_save = SaveModel(fold_folder)
             ghc = CachedHillClimbing(train_data, scoring_method=gv)
             gbn = ghc.estimate(callbacks=[cb_draw, cb_save], patience=p)
-
             with open(fold_folder + '/end.lock', 'w') as f:
                 pass
 
@@ -161,7 +81,6 @@ def run_bic_gaussian(train_data, result_folder, idx_fold):
     cb_draw = DrawModel(fold_folder)
     cb_save = SaveModel(fold_folder)
     gbn = ghc.estimate(callbacks=[cb_draw, cb_save])
-
     with open(fold_folder + '/end.lock', 'w') as f:
         pass
 
@@ -178,34 +97,16 @@ def run_bge_gaussian(train_data, result_folder, idx_fold):
     cb_draw = DrawModel(fold_folder)
     cb_save = SaveModel(fold_folder)
     gbn = ghc.estimate(callbacks=[cb_draw, cb_save])
-
     with open(fold_folder + '/end.lock', 'w') as f:
         pass
 
 
 def train_crossvalidation_file(file, folds, patience):
-    basefolder = os.path.basename(os.path.dirname(file))
-
-    # TODO Review bug in QSAR biodegradation Validation10_5 fold 0.
-    if basefolder == "Letter" or\
-            basefolder == "MFeatures" or\
-            basefolder == "Musk" or\
-            basefolder == "QSAR biodegradation":
+    x = experiments_helper.validate_dataset(file, [2, 3, 5, 10])
+    if x is None:
         return
-
-
-    result_folder = 'models/' + basefolder
-
-    dataset = pd.read_csv(file)
-    if "class" in dataset.columns:
-        dataset = dataset.drop("class", axis=1)
-    dataset = dataset.astype('float64')
-
-    to_remove_features = remove_crossvalidated_nan(dataset, folds)
-    dataset = dataset.drop(to_remove_features, axis=1)
-
-    dependent_features = linear_dependent_features(dataset)
-    dataset = dataset.drop(dependent_features, axis=1)
+    else:
+        dataset, result_folder = x
 
     if not os.path.exists(result_folder):
         os.mkdir(result_folder)
@@ -214,46 +115,35 @@ def train_crossvalidation_file(file, folds, patience):
     if not os.path.exists(result_folder + '/Gaussian'):
         os.mkdir(result_folder + '/Gaussian')
 
-    # with mp.Pool(processes=10) as p:
-    #     p.starmap(run_validation_ckde, [(dataset.iloc[train_indices,:], folds, patience, result_folder, idx_fold)
-    #                                          for (idx_fold, (train_indices, test_indices)) in
-    #                                          enumerate(KFold(10, shuffle=True, random_state=0).split(dataset))]
-    #               )
+    with mp.Pool(processes=10) as p:
+        p.starmap(run_validation_ckde, [(dataset.iloc[train_indices,:], folds, patience, result_folder, idx_fold)
+                                             for (idx_fold, (train_indices, test_indices)) in
+                                             enumerate(KFold(10, shuffle=True, random_state=0).split(dataset))]
+                  )
 
-    # with mp.Pool(processes=10) as p:
-    #     p.starmap(run_validation_gaussian, [(dataset.iloc[train_indices,:], folds, patience, result_folder, idx_fold)
-    #                                          for (idx_fold, (train_indices, test_indices)) in
-    #                                          enumerate(KFold(10, shuffle=True, random_state=0).split(dataset))]
-    #               )
+    with mp.Pool(processes=10) as p:
+        p.starmap(run_validation_gaussian, [(dataset.iloc[train_indices,:], folds, patience, result_folder, idx_fold)
+                                             for (idx_fold, (train_indices, test_indices)) in
+                                             enumerate(KFold(10, shuffle=True, random_state=0).split(dataset))]
+                  )
 
-    # with mp.Pool(processes=10) as p:
-    #     p.starmap(run_bic_gaussian, [(dataset.iloc[train_indices,:], result_folder, idx_fold)
-    #                                          for (idx_fold, (train_indices, test_indices)) in
-    #                                          enumerate(KFold(10, shuffle=True, random_state=0).split(dataset))]
-    #               )
+    with mp.Pool(processes=10) as p:
+        p.starmap(run_bic_gaussian, [(dataset.iloc[train_indices,:], result_folder, idx_fold)
+                                             for (idx_fold, (train_indices, test_indices)) in
+                                             enumerate(KFold(10, shuffle=True, random_state=0).split(dataset))]
+                  )
         
-    # with mp.Pool(processes=10) as p:
-    #     p.starmap(run_bge_gaussian, [(dataset.iloc[train_indices,:], result_folder, idx_fold)
-    #                                          for (idx_fold, (train_indices, test_indices)) in
-    #                                          enumerate(KFold(10, shuffle=True, random_state=0).split(dataset))]
-    #               )
-
-    # for (idx_fold, (train_indices, test_indices)) in enumerate(KFold(10, shuffle=True, random_state=0).split(dataset)):
-    #     train_dataset = dataset.iloc[train_indices, :]
-    #
-    #     run_validation_ckde(train_dataset, folds, patience, result_folder, idx_fold)
-        # run_cv_ckde(train_dataset, folds, result_folder, idx_fold)
-
-        # run_validation_gaussian(train_dataset, folds, patience, result_folder, idx_fold)
-
-        # run_bic_gaussian(train_dataset, result_folder, idx_fold)
-        # run_bge_gaussian(train_dataset, result_folder, idx_fold)
+    with mp.Pool(processes=10) as p:
+        p.starmap(run_bge_gaussian, [(dataset.iloc[train_indices,:], result_folder, idx_fold)
+                                             for (idx_fold, (train_indices, test_indices)) in
+                                             enumerate(KFold(10, shuffle=True, random_state=0).split(dataset))]
+                  )
 
 
 def train_crossvalidation():
-    files = find_crossvalidation_datasets()
+    files = experiments_helper.find_crossvalidation_datasets()
 
-    folds = [2, 3, 5, 10]
+    folds = [10]
     patience = [0, 5]
 
     for file in files:
@@ -266,12 +156,9 @@ def test_validation_ckde(train_data, test_data, folds, patience, result_folder, 
     for idx_k, k in enumerate(folds):
         for idx_p, p in enumerate(patience):
             models_folder = result_folder + '/CKDE/Validation_' + str(k) + "_" + str(p) + '/' + str(idx_fold)
-
             all_models = sorted(glob.glob(models_folder + '/*.pkl'))
-
             final_model = HybridContinuousModel.load_model(all_models[-1])
             final_model.fit(train_data)
-
             test_scores[idx_k, idx_p] = final_model.logpdf_dataset(test_data).sum()
 
     return test_scores
@@ -282,12 +169,9 @@ def test_cv_ckde(train_data, test_data, folds, result_folder, idx_fold):
 
     for idx_k, k in enumerate(folds):
         models_folder = result_folder + '/CKDE/CV_' + str(k) + '/' + str(idx_fold)
-
         all_models = sorted(glob.glob(models_folder + '/*.pkl'))
-
         final_model = HybridContinuousModel.load_model(all_models[-1])
         final_model.fit(train_data)
-
         test_scores[idx_k] = final_model.logpdf_dataset(test_data).sum()
 
     return test_scores
@@ -299,40 +183,34 @@ def test_validation_gaussian(train_data, test_data, folds, patience, result_fold
     for idx_k, k in enumerate(folds):
         for idx_p, p in enumerate(patience):
             models_folder = result_folder + '/Gaussian/Validation_' + str(k) + "_" + str(p) + '/' + str(idx_fold)
-
             all_models = sorted(glob.glob(models_folder + '/*.pkl'))
-
             final_model = LinearGaussianBayesianNetwork.load_model(all_models[-1])
             final_model.fit(train_data)
-
             test_scores[idx_k, idx_p] = final_model.logpdf_dataset(test_data).sum()
 
     return test_scores
 
+
 def test_bic_gaussian(train_data, test_data, result_folder, idx_fold):
     models_folder = result_folder + '/Gaussian/BIC/' + str(idx_fold)
-
     all_models = sorted(glob.glob(models_folder + '/*.pkl'))
-
     final_model = LinearGaussianBayesianNetwork.load_model(all_models[-1])
     final_model.fit(train_data)
 
     return final_model.logpdf_dataset(test_data).sum()
+
 
 def test_bge_gaussian(train_data, test_data, result_folder, idx_fold):
     models_folder = result_folder + '/Gaussian/BGe/' + str(idx_fold)
-
     all_models = sorted(glob.glob(models_folder + '/*.pkl'))
-
     final_model = LinearGaussianBayesianNetwork.load_model(all_models[-1])
     final_model.fit(train_data)
 
     return final_model.logpdf_dataset(test_data).sum()
 
 
-
 def test_crossvalidation():
-    files = find_crossvalidation_datasets()
+    files = experiments_helper.find_crossvalidation_datasets()
 
     folds = [2, 3, 5, 10]
     patience = [0, 5]
@@ -343,26 +221,11 @@ def test_crossvalidation():
 
     print(string_file)
     for file in files:
-        basefolder = os.path.basename(os.path.dirname(file))
-
-        if basefolder == "Letter" or \
-                basefolder == "MFeatures" or \
-                basefolder == "Musk" or \
-                basefolder == "QSAR biodegradation":
+        x = experiments_helper.validate_dataset(file, [2, 3, 5, 10])
+        if x is None:
             continue
-
-        result_folder = 'models/' + basefolder
-
-        dataset = pd.read_csv(file)
-        if "class" in dataset.columns:
-            dataset = dataset.drop("class", axis=1)
-        dataset = dataset.astype('float64')
-
-        to_remove_features = remove_crossvalidated_nan(dataset, folds)
-        dataset = dataset.drop(to_remove_features, axis=1)
-
-        dependent_features = linear_dependent_features(dataset)
-        dataset = dataset.drop(dependent_features, axis=1)
+        else:
+            dataset, result_folder = x
 
         validation_ckde = np.full((10, len(folds), len(patience)), np.nan)
         cv_ckde = np.full((10, len(folds)), np.nan)
@@ -387,6 +250,7 @@ def test_crossvalidation():
         sum_bic = bic_gaussian.sum(axis=0)
         sum_bge = bge_gaussian.sum(axis=0)
 
+        basefolder = os.path.basename(os.path.dirname(file))
         new_line = basefolder
 
         for idx_f, f in enumerate(folds):
@@ -402,7 +266,7 @@ def test_crossvalidation():
 
         string_file += '\n' + new_line
 
-    with open('cv_results.csv', 'w') as f:
+    with open('cv_results_bn.csv', 'w') as f:
         f.write(string_file)
 
 def run_holdout():
