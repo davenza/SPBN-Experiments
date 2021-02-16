@@ -3,7 +3,7 @@ import glob
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold
-from pgmpy.estimators import ValidationLikelihood
+from pybnesian.learning.scores import ValidatedLikelihood
 
 def find_crossvalidation_datasets():
     csv_files = glob.glob('data/**/*.csv')
@@ -41,10 +41,10 @@ def remove_crossvalidated_nan(dataset, folds):
         train_data = dataset.iloc[train_indices,:]
         # Inner for: Validation CV
         for k in folds:
-            vl = ValidationLikelihood(train_data, k=k, seed=0)
-            for (validation_train_indices, _) in vl.fold_indices:
-                cv_data = train_data.iloc[validation_train_indices, :]
-                d = cv_data.columns[np.isclose(cv_data.var(), 0)].tolist()
+            vl = ValidatedLikelihood(train_data, k=k, seed=0)
+            for (train_fold, _) in vl.cv_lik.cv:
+                train_fold_pandas = train_fold.to_pandas()
+                d = train_fold_pandas.columns[np.isclose(train_fold_pandas.var(), 0)].tolist()
                 to_delete.update(d)
 
     return to_delete
@@ -84,9 +84,10 @@ def validate_dataset(file, folds):
         dataset = dataset.drop("class", axis=1)
     dataset = dataset.astype('float64')
 
+    # Remove constant-value features.
     to_remove_features = remove_crossvalidated_nan(dataset, folds)
     dataset = dataset.drop(to_remove_features, axis=1)
-
+    # Remove linear dependent features
     dependent_features = linear_dependent_features(dataset)
     dataset = dataset.drop(dependent_features, axis=1)
 
