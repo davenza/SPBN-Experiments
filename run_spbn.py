@@ -48,7 +48,7 @@ def train_crossvalidation_file_hc(file, folds, patience):
     pathlib.Path(result_folder + '/HillClimbing/SPBN').mkdir(parents=True, exist_ok=True)
 
     with mp.Pool(processes=10) as p:
-        p.starmap(run_validation_spbn, [(dataset.iloc[train_indices,:], folds, patience, result_folder, idx_fold)
+        p.starmap(run_validation_spbn_hc, [(dataset.iloc[train_indices,:], folds, patience, result_folder, idx_fold)
                                              for (idx_fold, (train_indices, test_indices)) in
                                              enumerate(KFold(10, shuffle=True, random_state=0).split(dataset))]
                   )
