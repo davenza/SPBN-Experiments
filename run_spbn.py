@@ -25,7 +25,7 @@ def run_validation_spbn_hc(train_data, folds, patience, result_folder, idx_fold)
         vl = ValidatedLikelihood(train_data, k=k, seed=0)
 
         for p in patience:
-            fold_folder = result_folder + 'HillClimbing/SPBN/Validation_' + str(k) + '_' + str(p) + '/' + str(idx_fold)
+            fold_folder = result_folder + '/HillClimbing/SPBN/Validation_' + str(k) + '_' + str(p) + '/' + str(idx_fold)
             pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
             if os.path.exists(fold_folder + '/end.lock'):
