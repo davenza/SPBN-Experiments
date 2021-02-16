@@ -50,8 +50,8 @@ def plot_cd_diagrams(rename_dict):
     # df_concat = pd.concat([df_bn, df_gmm], axis=1)
     df_algorithms = pd.DataFrame(index=df_bn.index)
 
-    df_algorithms['CKDE_Validation_10_0'] = df_bn['CKDE_Validation_10_0']
-    df_algorithms['CKDE_Validation_10_5'] = df_bn['CKDE_Validation_10_5']
+    # df_algorithms['CKDE_Validation_10_0'] = df_bn['CKDE_Validation_10_0']
+    # df_algorithms['CKDE_Validation_10_5'] = df_bn['CKDE_Validation_10_5']
     df_algorithms['BIC'] = df_bn['BIC']
     df_algorithms['BGe'] = df_bn['BGe']
     df_algorithms['Gaussian_Validation_10_0'] = df_bn['Gaussian_Validation_10_0']
@@ -60,8 +60,8 @@ def plot_cd_diagrams(rename_dict):
     # df_algorithms['KDE'] = df_kde.loc[:, 'KDE']
     df_algorithms['KDEBN_0'] = df_kdebn.loc[:, 'KDEBN_Validation_10_0']
     df_algorithms['KDEBN_5'] = df_kdebn.loc[:, 'KDEBN_Validation_10_5']
-    # df_algorithms['SPBN_STRICT_10_0'] = df_spbn_strict.loc[:, 'SPBN_STRICT_10_0']
-    # df_algorithms['SPBN_STRICT_10_5'] = df_spbn_strict.loc[:, 'SPBN_STRICT_10_5']
+    df_algorithms['SPBN_STRICT_10_0'] = df_spbn_strict.loc[:, 'SPBN_STRICT_10_0']
+    df_algorithms['SPBN_STRICT_10_5'] = df_spbn_strict.loc[:, 'SPBN_STRICT_10_5']
 
     df_algorithms = df_algorithms.drop("Haberman", errors='ignore')
     df_algorithms = df_algorithms.drop("Thyroid", errors='ignore')
@@ -75,27 +75,27 @@ def plot_cd_diagrams(rename_dict):
     names = rank.columns.values
 
     print_apv(avgranks, names)
-    input()
+    input("Press [Enter]:")
 
     names = [rename_dict[s] for s in names]
 
     plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="cd")
-    tikzplotlib.save("plots/Nemenyi.tex", standalone=True, axis_width="12cm", axis_height="5cm")
+    tikzplotlib.save("plots/Nemenyi_spbn.tex", standalone=True, axis_width="12cm", axis_height="5cm")
 
     plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="holm")
-    tikzplotlib.save("plots/Holm.tex", standalone=True, axis_width="12cm", axis_height="5cm")
+    tikzplotlib.save("plots/Holm_spbn.tex", standalone=True, axis_width="12cm", axis_height="5cm")
 
     plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="bergmann")
-    tikzplotlib.save("plots/Bergmann.tex", standalone=True, axis_width="12cm", axis_height="5cm")
+    tikzplotlib.save("plots/Bergmann_spbn.tex", standalone=True, axis_width="12cm", axis_height="5cm")
 
     os.chdir("plots")
-    process = subprocess.Popen('pdflatex Nemenyi.tex'.split())
+    process = subprocess.Popen('pdflatex Nemenyi_spbn.tex'.split())
     process.wait()
-    process = subprocess.Popen('pdflatex Holm.tex'.split())
+    process = subprocess.Popen('pdflatex Holm_spbn.tex'.split())
     process.wait()
-    process = subprocess.Popen('pdflatex Bergmann.tex'.split())
+    process = subprocess.Popen('pdflatex Bergmann_spbn.tex'.split())
     process.wait()
-    process = subprocess.Popen('evince Bergmann.pdf'.split())
+    process = subprocess.Popen('evince Bergmann_spbn.pdf'.split())
     process.wait()
     os.chdir("..")
     return df_algorithms
@@ -120,9 +120,8 @@ def kdeness_ckde():
 
         for idx_f, f in enumerate(folds):
             for idx_p, p in enumerate(patience):
-                n_ckde_folds = np.empty((10,))
                 for idx_fold in range(10):
-                    models_folder = result_folder + '/CKDE/Validation_' + str(f) + "_" + str(p) + '/' + str(idx_fold)
+                    models_folder = result_folder + '/SPBN_Strict/Validation_' + str(f) + "_" + str(p) + '/' + str(idx_fold)
                     all_models = sorted(glob.glob(models_folder + '/*.pkl'))
                     final_model = HybridContinuousModel.load_model(all_models[-1])
 
@@ -159,14 +158,14 @@ def kdeness_ckde():
             offset += 1
             b.append(t)
 
-    ax.set_ylabel('Ratio of HLNP variables')
+    ax.set_ylabel('Ratio of CKDE variables')
     ax.set_xticks(ind + (1 - 0.3) / 2)
     ax.set_xticklabels(df.index)
     ax.tick_params(axis='x', rotation=90)
 
     # ax.legend(tuple([t[0] for t in b]), (r'$\lambda = 0$', r'$\lambda = 5$'))
     plt.legend([t[0] for t in b], [r'$\lambda = 0$', r'$\lambda = 5$'])
-    tikzplotlib.save("plots/kdeness.tex", standalone=True, axis_width="25cm", axis_height="10cm")
+    tikzplotlib.save("plots/kdeness_spbn.tex", standalone=True, axis_width="25cm", axis_height="10cm")
 
 def datasets_table():
     files = experiments_helper.find_crossvalidation_datasets()
@@ -195,7 +194,4 @@ if __name__ == '__main__':
     }
     # latex = plot_cd_diagrams(rename_dict)
 
-    df = kdeness_ckde()
-    # print(df)
-
-    # datasets_table()
+    kdeness_ckde()
