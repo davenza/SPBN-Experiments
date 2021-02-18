@@ -1,6 +1,6 @@
-from pgmpy.models import LinearGaussianBayesianNetwork
+from pybnesian.models import GaussianNetwork
 
-from pgmpy.factors.continuous import LinearGaussianCPD
+from pybnesian.factors.continuous import LinearGaussianCPD
 
 ecoli70_edges = [("asnA", "icdA"), ("asnA", "lacA"), ("asnA", "lacY"), ("asnA", "lacZ"), ("atpD", "yheI"),
                  ("b1191", "fixC"), ("b1191", "tnaA"), ("b1191", "ygcE"), ("cspA", "hupB"), ("cspA", "yfiA"),
@@ -16,69 +16,80 @@ ecoli70_edges = [("asnA", "icdA"), ("asnA", "lacA"), ("asnA", "lacY"), ("asnA", 
                  ("yceP", "yfaD"), ("ycgX", "dnaG"), ("yedE", "lpdA"), ("yedE", "pspA"), ("yedE", "pspB"),
                  ("yedE", "yheI"), ("yfiA", "hupB"), ("ygcE", "asnA"), ("ygcE", "atpD"), ("ygcE", "icdA"),
                  ("yheI", "b1963"), ("yheI", "dnaG"), ("yheI", "dnaK"), ("yheI", "folK"), ("yheI", "ycgX")]
-ecoli70_true = LinearGaussianBayesianNetwork(ecoli70_edges)
 
-naceB_cpd = LinearGaussianCPD("aceB", [0.13242569261183, 1.04635757628932], 0.0853322463431346, evidence=["icdA"])
-nasnA_cpd = LinearGaussianCPD("asnA", [0.349415009869147, 0.797454051860507], 0.091377044349203, evidence=["ygcE"])
-natpD_cpd = LinearGaussianCPD("atpD", [-0.0402501694925133, 0.26029355411225], 0.413077538236635, evidence=["sucA"])
-natpG_cpd = LinearGaussianCPD("atpG", [-0.890791388430668, 0.617997530736613], 0.394272310476586, evidence=["sucA"])
-nb1191_cpd = LinearGaussianCPD("b1191", [1.27298888888889], 0.394272310476586, evidence=[])
-nb1583_cpd = LinearGaussianCPD("b1583", [1.38195485260821, -0.245668694140272, 0.342180487030197, 0.240701924923215],
-                               1.10851698473552, evidence=["lacA", "lacZ", "yceP"])
-nb1963_cpd = LinearGaussianCPD("b1963", [0.964912524467121, 1.03757534619843], 0.376847578069874, evidence=["yheI"])
-ncchB_cpd = LinearGaussianCPD("cchB", [1.0695227190745, 0.617987590796824], 0.640624000516011, evidence=["fixC"])
-ncspA_cpd = LinearGaussianCPD("cspA", [-0.426485330431871, 0.288711521104643], 1.53666525861241, evidence=["cspG"])
-ncspG_cpd = LinearGaussianCPD("cspG", [2.02607777777778], 1.53666525861241, evidence=[])
-ndnaG_cpd = LinearGaussianCPD("dnaG", [0.117013173721892, 0.599217927973607], 0.130191263857037, evidence=["ycgX"])
-ndnaJ_cpd = LinearGaussianCPD("dnaJ", [0.120977044936101, -0.80848743830714], 0.575409831859209, evidence=["sucA"])
-ndnaK_cpd = LinearGaussianCPD("dnaK", [-0.246932639397469, 1.07972220045968], 0.29078069623137, evidence=["yheI"])
-neutG_cpd = LinearGaussianCPD("eutG", [1.2654], 0.29078069623137, evidence=[])
-nfixC_cpd = LinearGaussianCPD("fixC", [0.316475625354877, 0.940605169967976], 1.13092256847045, evidence=["b1191"])
-nflgD_cpd = LinearGaussianCPD("flgD", [-0.516670496649345, 0.636194477458189], 0.392910199740549, evidence=["sucA"])
-nfolK_cpd = LinearGaussianCPD("folK", [0.564081712668948, 0.818052833842901], 0.134440686243823, evidence=["yheI"])
-nftsJ_cpd = LinearGaussianCPD("ftsJ", [0.67375507560705, 0.924118624998095], 0.156400384096727, evidence=["mopB"])
-ngltA_cpd = LinearGaussianCPD("gltA", [-0.957213020409596, 0.378996309242844], 0.689475739295553, evidence=["sucA"])
-nhupB_cpd = LinearGaussianCPD("hupB", [-0.182057232775341, -0.298420831351019], 0.115852854692854, evidence=["cspA"])
-nibpB_cpd = LinearGaussianCPD("ibpB", [-0.422681344984383, 1.44714651845646], 0.460917470361575, evidence=["eutG"])
-nicdA_cpd = LinearGaussianCPD("icdA", [-0.415479141074751, 0.522839342002713], 0.317922835231157, evidence=["asnA"])
-nlacA_cpd = LinearGaussianCPD("lacA", [0.446869936975207, 0.272390375295782], 2.88701847183929, evidence=["asnA"])
-nlacY_cpd = LinearGaussianCPD("lacY", [-0.114875072385246, -0.203973523991992, -0.224081679385751, 0.353654849351698,
-                                       1.04620747922843], 0.0601948868954775, evidence=["asnA", "cspG", "eutG", "lacA"])
-nlacZ_cpd = LinearGaussianCPD("lacZ", [0.199960287950764, -0.0161160081571154, 1.36838438897368, -0.437567906926683],
-                              0.340842093761606, evidence=["asnA", "lacA", "lacY"])
-nlpdA_cpd = LinearGaussianCPD("lpdA", [-0.100748824167535, 0.960947689619709], 0.139900188017131, evidence=["yedE"])
-nmopB_cpd = LinearGaussianCPD("mopB", [0.0356843673407706, 0.895795370094267], 0.313865461466079, evidence=["dnaK"])
-nnmpC_cpd = LinearGaussianCPD("nmpC", [0.168814540829315, -0.769048388125465], 0.323216122193903, evidence=["pspA"])
-nnuoM_cpd = LinearGaussianCPD("nuoM", [-2.01756936954419, 0.408261463087646], 0.813346952088586, evidence=["lacY"])
-npspA_cpd = LinearGaussianCPD("pspA", [-0.190050948756035, 0.107925774798646, 0.139900305063269, -0.745569148727613],
-                              0.172352662979494, evidence=["cspG", "pspB", "yedE"])
-npspB_cpd = LinearGaussianCPD("pspB", [-0.249025674224647, 0.27586568417361], 0.270572341532042, evidence=["cspG"])
-nsucA_cpd = LinearGaussianCPD("sucA", [0.0242883995349437, -1.08940480794957], 0.658572859478727, evidence=["eutG"])
-nsucD_cpd = LinearGaussianCPD("sucD", [-0.590715250832464, 0.682993612059846], 0.435620955533374, evidence=["sucA"])
-ntnaA_cpd = LinearGaussianCPD("tnaA", [-0.386143611584432, -0.592613359406866, -0.244191251120212, 0.11057932748183],
-                              0.0962354963585222, evidence=["b1191", "fixC", "sucA"])
-nyaeM_cpd = LinearGaussianCPD("yaeM", [0.366511982255388, 1.47218224281833, -0.717294490090635, 0.720386046336195],
-                              0.656137473100376, evidence=["cspG", "lacA", "lacZ"])
-nyceP_cpd = LinearGaussianCPD("yceP", [-0.128044863272127, 1.14086751694794], 0.167357613801324, evidence=["eutG"])
-nycgX_cpd = LinearGaussianCPD("ycgX", [0.158383209367859, -0.27162389281435], 0.25549199455694, evidence=["fixC"])
-nyecO_cpd = LinearGaussianCPD("yecO", [0.271916815373091, 0.794866307734275], 0.224885544931109, evidence=["cspG"])
-nyedE_cpd = LinearGaussianCPD("yedE", [-0.160603913840411, -0.642026727910868], 0.277141174655962, evidence=["cspG"])
-nyfaD_cpd = LinearGaussianCPD("yfaD", [0.162825258971933, 0.287575666126123, -0.243740986008723, 0.317772348631983],
-                              0.186978049989421, evidence=["eutG", "sucA", "yceP"])
-nyfiA_cpd = LinearGaussianCPD("yfiA", [-1.19281955373651, 0.857226184005459], 0.315617310316409, evidence=["cspA"])
-nygbD_cpd = LinearGaussianCPD("ygbD", [1.35043585695614, 0.660688109638727], 0.740019852583048, evidence=["fixC"])
-nygcE_cpd = LinearGaussianCPD("ygcE", [0.523950787783123, 1.88150806870923], 0.342943367860131, evidence=["b1191"])
-nyhdM_cpd = LinearGaussianCPD("yhdM", [0.208497971803439, -0.777023535367737], 0.58816130696048, evidence=["sucA"])
-nyheI_cpd = LinearGaussianCPD("yheI", [-0.213744327919123, -0.963322817214627], 0.140622580686929, evidence=["atpD"])
-nyjbO_cpd = LinearGaussianCPD("yjbO", [1.59101725959839, -0.0706404791581134], 1.85120271278237, evidence=["fixC"])
+ecoli70_true = GaussianNetwork(ecoli70_edges)
 
-ecoli70_true.add_cpds(naceB_cpd, nasnA_cpd, natpD_cpd, natpG_cpd, nb1191_cpd, nb1583_cpd, nb1963_cpd, ncchB_cpd,
-                      ncspA_cpd, ncspG_cpd, ndnaG_cpd, ndnaJ_cpd, ndnaK_cpd, neutG_cpd, nfixC_cpd, nflgD_cpd,
-                      nfolK_cpd, nftsJ_cpd, ngltA_cpd, nhupB_cpd, nibpB_cpd, nicdA_cpd, nlacA_cpd, nlacY_cpd, nlacZ_cpd,
-                      nlpdA_cpd, nmopB_cpd, nnmpC_cpd, nnuoM_cpd, npspA_cpd, npspB_cpd, nsucA_cpd, nsucD_cpd, ntnaA_cpd,
-                      nyaeM_cpd, nyceP_cpd, nycgX_cpd, nyecO_cpd, nyedE_cpd, nyfaD_cpd, nyfiA_cpd, nygbD_cpd, nygcE_cpd,
-                      nyhdM_cpd, nyheI_cpd, nyjbO_cpd)
+naceB_cpd = LinearGaussianCPD("aceB", ["icdA"], [0.13242569261183, 1.04635757628932], 0.0853322463431346)
+nasnA_cpd = LinearGaussianCPD("asnA", ["ygcE"], [0.349415009869147, 0.797454051860507], 0.091377044349203)
+natpD_cpd = LinearGaussianCPD("atpD", ["sucA", "ygcE"], [-0.0402501694925133, 0.26029355411225, -0.725220144407677], 
+                        0.413077538236635)
+natpG_cpd = LinearGaussianCPD("atpG", ["sucA"], [-0.890791388430668, 0.617997530736613], 0.394272310476586)
+nb1191_cpd = LinearGaussianCPD("b1191", [], [1.27298888888889], 0.394272310476586)
+nb1583_cpd = LinearGaussianCPD("b1583", ["lacA", "lacZ", "yceP"], [1.38195485260821, -0.245668694140272,
+                        0.342180487030197, 0.240701924923215], 1.10851698473552)
+nb1963_cpd = LinearGaussianCPD("b1963", ["yheI"], [0.964912524467121, 1.03757534619843], 0.376847578069874)
+ncchB_cpd = LinearGaussianCPD("cchB", ["fixC"], [1.0695227190745, 0.617987590796824], 0.640624000516011)
+ncspA_cpd = LinearGaussianCPD("cspA", ["cspG"], [-0.426485330431871, 0.288711521104643], 1.53666525861241)
+ncspG_cpd = LinearGaussianCPD("cspG", [], [2.02607777777778], 1.53666525861241)
+ndnaG_cpd = LinearGaussianCPD("dnaG", ["ycgX", "yheI"], [0.117013173721892, 0.599217927973607, 0.19548023832922],
+                        0.130191263857037)
+ndnaJ_cpd = LinearGaussianCPD("dnaJ", ["sucA"], [0.120977044936101, -0.80848743830714], 0.575409831859209)
+ndnaK_cpd = LinearGaussianCPD("dnaK", ["yheI"], [-0.246932639397469, 1.07972220045968], 0.29078069623137)
+neutG_cpd = LinearGaussianCPD("eutG", [], [1.2654], 0.29078069623137)
+nfixC_cpd = LinearGaussianCPD("fixC", ["b1191"], [0.316475625354877, 0.940605169967976], 1.13092256847045)
+nflgD_cpd = LinearGaussianCPD("flgD", ["sucA"], [-0.516670496649345, 0.636194477458189], 0.392910199740549)
+nfolK_cpd = LinearGaussianCPD("folK", ["yheI"], [0.564081712668948, 0.818052833842901], 0.134440686243823)
+nftsJ_cpd = LinearGaussianCPD("ftsJ", ["mopB"], [0.67375507560705, 0.924118624998095], 0.156400384096727)
+ngltA_cpd = LinearGaussianCPD("gltA", ["sucA"], [-0.957213020409596, 0.378996309242844], 0.689475739295553)
+nhupB_cpd = LinearGaussianCPD("hupB", ["cspA", "yfiA"], [-0.182057232775341, -0.298420831351019, 1.38668710740782],
+                        0.115852854692854)
+nibpB_cpd = LinearGaussianCPD("ibpB", ["eutG", "yceP"], [-0.422681344984383, 1.44714651845646, 0.124928507689605],
+                        0.460917470361575)
+nicdA_cpd = LinearGaussianCPD("icdA", ["asnA", "ygcE"], [-0.415479141074751, 0.522839342002713, -1.05848138451133],
+                        0.317922835231157)
+nlacA_cpd = LinearGaussianCPD("lacA", ["asnA", "cspG"], [0.446869936975207, 0.272390375295782, 0.253905927385149],
+                        2.88701847183929)
+nlacY_cpd = LinearGaussianCPD("lacY", ["asnA", "cspG", "eutG", "lacA"], [-0.114875072385246, -0.203973523991992,
+                        -0.224081679385751, 0.353654849351698, 1.04620747922843], 0.0601948868954775)
+nlacZ_cpd = LinearGaussianCPD("lacZ", ["asnA", "lacA", "lacY"], [0.199960287950764, -0.0161160081571154,
+                        1.36838438897368, -0.437567906926683], 0.340842093761606)
+nlpdA_cpd = LinearGaussianCPD("lpdA", ["yedE"], [-0.100748824167535, 0.960947689619709], 0.139900188017131)
+nmopB_cpd = LinearGaussianCPD("mopB", ["dnaK", "lacZ"], [0.0356843673407706, 0.895795370094267, -0.0590288284905714],
+                        0.313865461466079)
+nnmpC_cpd = LinearGaussianCPD("nmpC", ["pspA"], [0.168814540829315, -0.769048388125465], 0.323216122193903)
+nnuoM_cpd = LinearGaussianCPD("nuoM", ["lacY"], [-2.01756936954419, 0.408261463087646], 0.813346952088586)
+npspA_cpd = LinearGaussianCPD("pspA", ["cspG", "pspB", "yedE"], [-0.190050948756035, 0.107925774798646,
+                        0.139900305063269, -0.745569148727613], 0.172352662979494)
+npspB_cpd = LinearGaussianCPD("pspB", ["cspG", "yedE"], [-0.249025674224647, 0.27586568417361, -0.988610850844799],
+                        0.270572341532042)
+nsucA_cpd = LinearGaussianCPD("sucA", ["eutG"], [0.0242883995349437, -1.08940480794957], 0.658572859478727)
+nsucD_cpd = LinearGaussianCPD("sucD", ["sucA"], [-0.590715250832464, 0.682993612059846], 0.435620955533374)
+ntnaA_cpd = LinearGaussianCPD("tnaA", ["b1191", "fixC", "sucA"], [-0.386143611584432, -0.592613359406866,
+                        -0.244191251120212, 0.11057932748183], 0.0962354963585222)
+nyaeM_cpd = LinearGaussianCPD("yaeM", ["cspG", "lacA", "lacZ"], [0.366511982255388, 1.47218224281833,
+                        -0.717294490090635, 0.720386046336195], 0.656137473100376)
+nyceP_cpd = LinearGaussianCPD("yceP", ["eutG", "fixC"], [-0.128044863272127, 1.14086751694794, -0.326743343637965],
+                        0.167357613801324)
+nycgX_cpd = LinearGaussianCPD("ycgX", ["fixC", "yheI"], [0.158383209367859, -0.27162389281435, 1.24483248188832],
+                        0.25549199455694)
+nyecO_cpd = LinearGaussianCPD("yecO", ["cspG"], [0.271916815373091, 0.794866307734275], 0.224885544931109)
+nyedE_cpd = LinearGaussianCPD("yedE", ["cspG"], [-0.160603913840411, -0.642026727910868], 0.277141174655962)
+nyfaD_cpd = LinearGaussianCPD("yfaD", ["eutG", "sucA", "yceP"], [0.162825258971933, 0.287575666126123,
+                        -0.243740986008723, 0.317772348631983], 0.186978049989421)
+nyfiA_cpd = LinearGaussianCPD("yfiA", ["cspA"], [-1.19281955373651, 0.857226184005459], 0.315617310316409)
+nygbD_cpd = LinearGaussianCPD("ygbD", ["fixC"], [1.35043585695614, 0.660688109638727], 0.740019852583048)
+nygcE_cpd = LinearGaussianCPD("ygcE", ["b1191", "sucA"], [0.523950787783123, 1.88150806870923, 0.632653458463342],
+                        0.342943367860131)
+nyhdM_cpd = LinearGaussianCPD("yhdM", ["sucA"], [0.208497971803439, -0.777023535367737], 0.58816130696048)
+nyheI_cpd = LinearGaussianCPD("yheI", ["atpD", "yedE"], [-0.213744327919123, -0.963322817214627, 0.338150174771458],
+                        0.140622580686929)
+nyjbO_cpd = LinearGaussianCPD("yjbO", ["fixC"], [1.59101725959839, -0.0706404791581134], 1.85120271278237)
 
+ecoli70_true.add_cpds([naceB_cpd, nasnA_cpd, natpD_cpd, natpG_cpd, nb1191_cpd, nb1583_cpd, nb1963_cpd, ncchB_cpd, ncspA_cpd, 
+         ncspG_cpd, ndnaG_cpd, ndnaJ_cpd, ndnaK_cpd, neutG_cpd, nfixC_cpd, nflgD_cpd, nfolK_cpd, nftsJ_cpd, ngltA_cpd,
+         nhupB_cpd, nibpB_cpd, nicdA_cpd, nlacA_cpd, nlacY_cpd, nlacZ_cpd, nlpdA_cpd, nmopB_cpd, nnmpC_cpd, nnuoM_cpd,
+         npspA_cpd, npspB_cpd, nsucA_cpd, nsucD_cpd, ntnaA_cpd, nyaeM_cpd, nyceP_cpd, nycgX_cpd, nyecO_cpd, nyedE_cpd,
+         nyfaD_cpd, nyfiA_cpd, nygbD_cpd, nygcE_cpd, nyhdM_cpd, nyheI_cpd, nyjbO_cpd])
 
 
 magic_niab_edges = [("YR.GLASS", "YR.FIELD"), ("YR.GLASS", "YLD"), ("HT", "YLD"), ("HT", "FUS"), ("MIL", "YR.GLASS"),
@@ -95,82 +106,75 @@ magic_niab_edges = [("YR.GLASS", "YR.FIELD"), ("YR.GLASS", "YLD"), ("HT", "YLD")
                     ("G1276", "FT"), ("G1276", "G266"), ("G1263", "FT"), ("G2318", "FT"), ("G1294", "FT"),
                     ("G1800", "FT"), ("G1750", "YR.GLASS"), ("G1750", "G1373"), ("G524", "MIL"), ("G775", "FT"),
                     ("G2835", "HT"), ("G2835", "G1800")]
-magic_niab_true = LinearGaussianBayesianNetwork(magic_niab_edges)
+magic_niab_true = GaussianNetwork(magic_niab_edges)
 
-nYR_GLASS_cpd = LinearGaussianCPD("YR.GLASS", [1.54844302267369, 0.0717600960847646, 0.270041836158829,
-                                               0.104152817662929, 0.0791952982553062, 0.0575397513162529,
-                                               0.0460650341993502, 0.0473804954922319, -0.0748212016501862],
-                                  0.110793639301008, evidence=["MIL", "G418", "G311", "G1217", "G800",
-                                                               "G866", "G795", "G1750"])
-nHT_cpd = LinearGaussianCPD("HT", [76.6512071932518, -0.507074807384162, 1.74933735123688, -1.34878951675932,
-                                   -0.782692835105993, 0.576664798593437, -0.665074197521551, -1.39696073681331],
-                            10.9772027430371, evidence=["G832", "G1896", "G2953", "G266", "G847", "G942", "G2835"])
-nYR_FIELD_cpd = LinearGaussianCPD("YR.FIELD", [2.32295708182543, 0.271335446983743, -0.0243037650778042,
-                                               0.0889655633422241, -0.165509829110372, -0.069916852048045,
-                                               0.209960372917106, -0.0629432000248825, 0.0835813215381744,
-                                               0.080354317755385], 0.161791610084295,
-                                  evidence=["YR.GLASS", "FT", "G418", "G200", "G257", "G2208", "G1373", "G599", "G261"])
-nMIL_cpd = LinearGaussianCPD("MIL", [2.04626499115395, 0.135013720335568, 0.423758644702295, -0.110522752908506,
-                                     0.107845505166397, 0.112708037931228], 0.473100824285445,
-                             evidence=["G1217", "G2208", "G1945", "G1338", "G524"])
-nFT_cpd = LinearGaussianCPD("FT", [32.0404937278366, -1.13129069534277, -0.455410687395962, 0.815509568093217,
-                                   -0.4322564499603, -0.43645906875359, 1.61058065535837, -0.813671043113477],
-                            7.96856314012303, evidence=["G266", "G1276", "G1263", "G2318", "G1294", "G1800", "G775"])
-nG418_cpd = LinearGaussianCPD("G418", [1.46333333333333], 7.96856314012303, evidence=[])
-nG311_cpd = LinearGaussianCPD("G311", [1.25333333333333, 0.154285714285714], 0.691345755693582, evidence=["G1853"])
-nG1217_cpd = LinearGaussianCPD("G1217", [1.43], 0.691345755693582, evidence=[])
-nG800_cpd = LinearGaussianCPD("G800", [0.745], 0.691345755693582, evidence=[])
-nG866_cpd = LinearGaussianCPD("G866", [1.245], 0.691345755693582, evidence=[])
-nG795_cpd = LinearGaussianCPD("G795", [0.746666666666667], 0.691345755693582, evidence=[])
-nG2570_cpd = LinearGaussianCPD("G2570", [1.79666666666667], 0.691345755693582, evidence=[])
-nG260_cpd = LinearGaussianCPD("G260", [0.24], 0.691345755693582, evidence=[])
-nG2920_cpd = LinearGaussianCPD("G2920", [1.53333333333333], 0.691345755693582, evidence=[])
-nG832_cpd = LinearGaussianCPD("G832", [1.43833333333333], 0.691345755693582, evidence=[])
-nG1896_cpd = LinearGaussianCPD("G1896", [0.661388988844908, 0.184379742478527], 0.870836828887045, evidence=["G2953"])
-nG2953_cpd = LinearGaussianCPD("G2953", [0.345], 0.870836828887045, evidence=[])
-nG266_cpd = LinearGaussianCPD("G266", [0.0208662817443961, 0.0820919136959172], 0.439702392033206, evidence=["G1338"])
-nG847_cpd = LinearGaussianCPD("G847", [1.345], 0.439702392033206, evidence=[])
-nG942_cpd = LinearGaussianCPD("G942", [0.276666666666667], 0.439702392033206, evidence=[])
-nG200_cpd = LinearGaussianCPD("G200", [0.221666666666667], 0.439702392033206, evidence=[])
-nG257_cpd = LinearGaussianCPD("G257", [1.7468740790637, -0.459352502841746], 0.780769392692097, evidence=["G1217"])
-nG2208_cpd = LinearGaussianCPD("G2208", [0.0826721209342784, -0.0406777867898579], 0.0655182220603534,
-                               evidence=["G257"])
-nG1373_cpd = LinearGaussianCPD("G1373", [1.31439393939394, 0.196969696969697], 0.713521080368907, evidence=["G1750"])
-nG599_cpd = LinearGaussianCPD("G599", [1.72833333333333], 0.713521080368907, evidence=[])
-nG261_cpd = LinearGaussianCPD("G261", [1.56], 0.713521080368907, evidence=[])
-nG383_cpd = LinearGaussianCPD("G383", [1.90803027345868, -0.162904170190619], 0.345177946250548, evidence=["G800"])
-nG1853_cpd = LinearGaussianCPD("G1853", [1.75], 0.345177946250548, evidence=[])
-nG1033_cpd = LinearGaussianCPD("G1033", [0.301666666666667], 0.345177946250548, evidence=[])
-nG1945_cpd = LinearGaussianCPD("G1945", [0.946666666666667], 0.345177946250548, evidence=[])
-nG1338_cpd = LinearGaussianCPD("G1338", [0.803333333333333], 0.345177946250548, evidence=[])
-nG1276_cpd = LinearGaussianCPD("G1276", [0.635176934468947, 0.364410645437447], 0.84188312260319, evidence=["G599"])
-nG1263_cpd = LinearGaussianCPD("G1263", [1.655], 0.84188312260319, evidence=[])
-nG1789_cpd = LinearGaussianCPD("G1789", [0.21267087276551, 0.252365930599369], 0.451616675282839, evidence=["G266"])
-nG2318_cpd = LinearGaussianCPD("G2318", [1.30833333333333], 0.451616675282839, evidence=[])
-nG1294_cpd = LinearGaussianCPD("G1294", [0.31891984149364, 0.332173229047626], 0.840504067715391, evidence=["G418"])
-nG1800_cpd = LinearGaussianCPD("G1800", [-0.155657232265757, 0.0760325820241959, 0.0437221396897852, 0.0739911794545512,
-                                         0.12429716747026], 0.0509065596144282, evidence=["G1217", "G2953", "G257",
-                                                                                          "G2835"])
-nYLD_cpd = LinearGaussianCPD("YLD", [6.53419402287034, 0.140830413187163, 0.0211962288039096, -0.0487769127421907,
-                                     0.11980550569289, 0.108555846504216, 0.0671304968137395, 0.0828435628345042],
-                             0.1930493992975, evidence=["YR.GLASS", "HT", "FT", "G2570", "G260", "G2920", "G832"])
-nFUS_cpd = LinearGaussianCPD("FUS", [8.20617743999716, -0.0537446640436977, -0.127186349222556, -0.148013461521599,
-                                     0.256577685483212, -0.162626080344374, 0.166646496321968], 0.601553023870165,
-                             evidence=["HT", "G832", "G1896", "G383", "G1853", "G1033"])
-nG1750_cpd = LinearGaussianCPD("G1750", [0.24], 0.601553023870165, evidence=[])
-nG524_cpd = LinearGaussianCPD("G524", [0.466666666666667], 0.601553023870165, evidence=[])
-nG775_cpd = LinearGaussianCPD("G775", [0.22], 0.601553023870165, evidence=[])
-nG2835_cpd = LinearGaussianCPD("G2835", [0.012533578711468, 0.0438267115866962], 0.0729273101525584, evidence=["G418"])
-nG43_cpd = LinearGaussianCPD("G43", [0.535249638607806, -0.255087290114534], 0.210343459256865, evidence=["G311"])
+nYR_GLASS_cpd = LinearGaussianCPD("YR.GLASS", ["MIL", "G418", "G311", "G1217", "G800", "G866", "G795", "G1750"],
+        [1.54844302267369, 0.0717600960847646, 0.270041836158829, 0.104152817662929, 0.0791952982553062,
+        0.0575397513162529, 0.0460650341993502, 0.0473804954922319, -0.0748212016501862], 0.110793639301008)
+nHT_cpd = LinearGaussianCPD("HT", ["G832", "G1896", "G2953", "G266", "G847", "G942", "G2835"],
+        [76.6512071932518, -0.507074807384162, 1.74933735123688, -1.34878951675932, -0.782692835105993,
+        0.576664798593437, -0.665074197521551, -1.39696073681331], 10.9772027430371)
+nYR_FIELD_cpd = LinearGaussianCPD("YR.FIELD", ["YR.GLASS", "FT", "G418", "G200", "G257", "G2208", "G1373", "G599", "G261"],
+        [2.32295708182543, 0.271335446983743, -0.0243037650778042, 0.0889655633422241, -0.165509829110372, -0.069916852048045,
+        0.209960372917106, -0.0629432000248825, 0.0835813215381744, 0.080354317755385], 0.161791610084295)
+nMIL_cpd = LinearGaussianCPD("MIL", ["G1217", "G2208", "G1945", "G1338", "G524"],
+        [2.04626499115395, 0.135013720335568, 0.423758644702295, -0.110522752908506, 0.107845505166397, 0.112708037931228],
+        0.473100824285445)
+nFT_cpd = LinearGaussianCPD("FT", ["G266", "G1276", "G1263", "G2318", "G1294", "G1800", "G775"],
+        [32.0404937278366, -1.13129069534277, -0.455410687395962, 0.815509568093217, -0.4322564499603, -0.43645906875359,
+        1.61058065535837, -0.813671043113477], 7.96856314012303)
+nG418_cpd = LinearGaussianCPD("G418", [], [1.46333333333333], 7.96856314012303)
+nG311_cpd = LinearGaussianCPD("G311", ["G1853"], [1.25333333333333, 0.154285714285714], 0.691345755693582)
+nG1217_cpd = LinearGaussianCPD("G1217", [], [1.43], 0.691345755693582)
+nG800_cpd = LinearGaussianCPD("G800", [], [0.745], 0.691345755693582)
+nG866_cpd = LinearGaussianCPD("G866", [], [1.245], 0.691345755693582)
+nG795_cpd = LinearGaussianCPD("G795", [], [0.746666666666667], 0.691345755693582)
+nG2570_cpd = LinearGaussianCPD("G2570", [], [1.79666666666667], 0.691345755693582)
+nG260_cpd = LinearGaussianCPD("G260", [], [0.24], 0.691345755693582)
+nG2920_cpd = LinearGaussianCPD("G2920", [], [1.53333333333333], 0.691345755693582)
+nG832_cpd = LinearGaussianCPD("G832", [], [1.43833333333333], 0.691345755693582)
+nG1896_cpd = LinearGaussianCPD("G1896", ["G2953"], [0.661388988844908, 0.184379742478527], 0.870836828887045)
+nG2953_cpd = LinearGaussianCPD("G2953", [], [0.345], 0.870836828887045)
+nG266_cpd = LinearGaussianCPD("G266", ["G1338", "G1276"], [0.0208662817443961, 0.0820919136959172, 0.15271663840834],
+        0.439702392033206)
+nG847_cpd = LinearGaussianCPD("G847", [], [1.345], 0.439702392033206)
+nG942_cpd = LinearGaussianCPD("G942", [], [0.276666666666667], 0.439702392033206)
+nG200_cpd = LinearGaussianCPD("G200", [], [0.221666666666667], 0.439702392033206)
+nG257_cpd = LinearGaussianCPD("G257", ["G1217"], [1.7468740790637, -0.459352502841746], 0.780769392692097)
+nG2208_cpd = LinearGaussianCPD("G2208", ["G257"], [0.0826721209342784, -0.0406777867898579], 0.0655182220603534)
+nG1373_cpd = LinearGaussianCPD("G1373", ["G1750"], [1.31439393939394, 0.196969696969697], 0.713521080368907)
+nG599_cpd = LinearGaussianCPD("G599", [], [1.72833333333333], 0.713521080368907)
+nG261_cpd = LinearGaussianCPD("G261", [], [1.56], 0.713521080368907)
+nG383_cpd = LinearGaussianCPD("G383", ["G800"], [1.90803027345868, -0.162904170190619], 0.345177946250548)
+nG1853_cpd = LinearGaussianCPD("G1853", [], [1.75], 0.345177946250548)
+nG1033_cpd = LinearGaussianCPD("G1033", [], [0.301666666666667], 0.345177946250548)
+nG1945_cpd = LinearGaussianCPD("G1945", [], [0.946666666666667], 0.345177946250548)
+nG1338_cpd = LinearGaussianCPD("G1338", [], [0.803333333333333], 0.345177946250548)
+nG1276_cpd = LinearGaussianCPD("G1276", ["G599"], [0.635176934468947, 0.364410645437447], 0.84188312260319)
+nG1263_cpd = LinearGaussianCPD("G1263", [], [1.655], 0.84188312260319)
+nG1789_cpd = LinearGaussianCPD("G1789", ["G266"], [0.21267087276551, 0.252365930599369], 0.451616675282839)
+nG2318_cpd = LinearGaussianCPD("G2318", [], [1.30833333333333], 0.451616675282839)
+nG1294_cpd = LinearGaussianCPD("G1294", ["G418"], [0.31891984149364, 0.332173229047626], 0.840504067715391)
+nG1800_cpd = LinearGaussianCPD("G1800", ["G1217", "G2953", "G257", "G2835"],
+        [-0.155657232265757, 0.0760325820241959, 0.0437221396897852, 0.0739911794545512, 0.12429716747026],
+        0.0509065596144282)
+nYLD_cpd = LinearGaussianCPD("YLD", ["YR.GLASS", "HT", "FT", "G2570", "G260", "G2920", "G832"],
+        [6.53419402287034, 0.140830413187163, 0.0211962288039096, -0.0487769127421907, 0.11980550569289,
+        0.108555846504216, 0.0671304968137395, 0.0828435628345042], 0.1930493992975)
+nFUS_cpd = LinearGaussianCPD("FUS", ["HT", "G832", "G1896", "G383", "G1853", "G1033"],
+        [8.20617743999716, -0.0537446640436977, -0.127186349222556, -0.148013461521599, 0.256577685483212,
+        -0.162626080344374, 0.166646496321968], 0.601553023870165)
+nG1750_cpd = LinearGaussianCPD("G1750", [], [0.24], 0.601553023870165)
+nG524_cpd = LinearGaussianCPD("G524", [], [0.466666666666667], 0.601553023870165)
+nG775_cpd = LinearGaussianCPD("G775", [], [0.22], 0.601553023870165)
+nG2835_cpd = LinearGaussianCPD("G2835", ["G418"], [0.012533578711468, 0.0438267115866962], 0.0729273101525584)
+nG43_cpd = LinearGaussianCPD("G43", ["G311"], [0.535249638607806, -0.255087290114534], 0.210343459256865)
 
-magic_niab_true.add_cpds(nYR_GLASS_cpd, nHT_cpd, nYR_FIELD_cpd, nMIL_cpd, nFT_cpd, nG418_cpd, nG311_cpd, nG1217_cpd,
-                         nG800_cpd, nG866_cpd, nG795_cpd, nG2570_cpd, nG260_cpd, nG2920_cpd, nG832_cpd, nG1896_cpd,
-                         nG2953_cpd, nG266_cpd, nG847_cpd, nG942_cpd, nG200_cpd, nG257_cpd, nG2208_cpd, nG1373_cpd,
-                         nG599_cpd, nG261_cpd, nG383_cpd, nG1853_cpd, nG1033_cpd, nG1945_cpd, nG1338_cpd, nG1276_cpd,
-                         nG1263_cpd, nG1789_cpd, nG2318_cpd, nG1294_cpd, nG1800_cpd, nYLD_cpd, nFUS_cpd, nG1750_cpd,
-                         nG524_cpd, nG775_cpd, nG2835_cpd, nG43_cpd)
-
-
+magic_niab_true.add_cpds([nYR_GLASS_cpd, nHT_cpd, nYR_FIELD_cpd, nMIL_cpd, nFT_cpd, nG418_cpd, nG311_cpd, nG1217_cpd, nG800_cpd,
+                          nG866_cpd, nG795_cpd, nG2570_cpd, nG260_cpd, nG2920_cpd, nG832_cpd, nG1896_cpd, nG2953_cpd, nG266_cpd,
+                          nG847_cpd, nG942_cpd, nG200_cpd, nG257_cpd, nG2208_cpd, nG1373_cpd, nG599_cpd, nG261_cpd, nG383_cpd,
+                          nG1853_cpd, nG1033_cpd, nG1945_cpd, nG1338_cpd, nG1276_cpd, nG1263_cpd, nG1789_cpd, nG2318_cpd,
+                          nG1294_cpd, nG1800_cpd, nYLD_cpd, nFUS_cpd, nG1750_cpd, nG524_cpd, nG775_cpd, nG2835_cpd, nG43_cpd])
 
 magic_irri_edges = [("HT", "YLD"), ("FT", "HT"), ("FT", "YLD"), ("FT", "CHALK"), ("AMY", "GTEMP"), ("AMY", "CHALK"),
                     ("GL", "GW"), ("GL", "CHALK"), ("GW", "YLD"), ("GW", "CHALK"), ("GTEMP", "GW"), ("GTEMP", "CHALK"),
@@ -193,108 +197,111 @@ magic_irri_edges = [("HT", "YLD"), ("FT", "HT"), ("FT", "YLD"), ("FT", "CHALK"),
                     ("G3927", "GL"), ("G3927", "GW"), ("G5997", "G6003"), ("G5997", "G6010"), ("G4553", "SUB"),
                     ("G2179", "BROWN"), ("G5006", "YLD"), ("G3992", "GL"), ("G678", "HT"), ("G3925", "G5794")]
 
-magic_irri_true = LinearGaussianBayesianNetwork(magic_irri_edges)
+magic_irri_true = GaussianNetwork(magic_irri_edges)
 
-nHT_cpd = LinearGaussianCPD("HT", [-1.35233341815215, 1.05636175438225, -1.07056485037116, 1.043027091355,
-                                   -0.492561317337783, -0.516613589615864, 4.20237584479626], 52.3676466180205,
-                            evidence=["FT", "G3486", "G1533", "G4156", "G4382", "G678"])
-nFT_cpd = LinearGaussianCPD("FT", [91.2598629865165, 1.1440313508012, -0.249416855891503, 0.339953247290818,
-                                   0.42468294621476, -0.255280813014823, 0.517271281551463, -0.3111428984492],
-                            5.36451503082456, evidence=["G1533", "G2639", "G3823", "G1378", "G3098", "G3136", "G4145"])
-nAMY_cpd = LinearGaussianCPD("AMY", [22.6889556178845, -0.865160875707754, -0.206462120017453, 0.328734955712311,
-                                     -0.289706009684452, -0.444746533131511, -0.290480887948771],
-                             2.36379481379116, evidence=["G3105", "G3102", "G3098", "G317", "G3106", "G1266"])
-nGL_cpd = LinearGaussianCPD("GL", [6.48066281698334, -0.276330265231098, 0.0378423810269304, -0.0671292229838255,
-                                   -0.0656702393745024, 0.0455651992437016, 0.0487496267556403, -0.0937109972081314,
-                                   0.192679273274655, -0.0872267790902625], 0.104724643292958,
-                            evidence=["G1778", "G3872", "G4529", "G1440", "G5794", "G4668", "G2764", "G3927", "G3992"])
-nGW_cpd = LinearGaussianCPD("GW", [2.93710650429725, -0.095387290513827, -0.00251525234366862, -0.0972224870076159,
-                                   0.0153174923183445, 0.0969421193903015, -0.0673506031137825],
-                            0.0166302302938114, evidence=["GL", "GTEMP", "G4432", "G5794", "G2764", "G3927"])
-nGTEMP_cpd = LinearGaussianCPD("GTEMP", [81.8469452808735, -0.289507587781954, -1.99288858026669, -0.777421563956774,
-                                         1.4809583678463, 1.54996365108539],
-                               3.42443336652435, evidence=["AMY", "G3219", "G3209", "G3222", "G3212"])
-nG4432_cpd = LinearGaussianCPD("G4432", [0.282208588957054, -0.0721387772371474], 0.394283647523444, evidence=["G1533"])
-nG2670_cpd = LinearGaussianCPD("G2670", [0.214395099540582, 0.0817425423956083], 0.475587406298529, evidence=["G2815"])
-nG4744_cpd = LinearGaussianCPD("G4744", [0.139834406623735], 0.475587406298529, evidence=[])
-nG3092_cpd = LinearGaussianCPD("G3092", [0.266789328426863], 0.475587406298529, evidence=[])
-nG3486_cpd = LinearGaussianCPD("G3486", [0.650544135429258, -0.132964375406939], 0.818014485417068, evidence=["G3209"])
-nG1533_cpd = LinearGaussianCPD("G1533", [0.800367985280589], 0.818014485417068, evidence=[])
-nG2639_cpd = LinearGaussianCPD("G2639", [0.921803127874885], 0.818014485417068, evidence=[])
-nG3823_cpd = LinearGaussianCPD("G3823", [0.739650413983441], 0.818014485417068, evidence=[])
-nG1378_cpd = LinearGaussianCPD("G1378", [0.459981600735971], 0.818014485417068, evidence=[])
-nG3105_cpd = LinearGaussianCPD("G3105", [0.914147521160816, -0.20322760673426], 0.938146626163164, evidence=["G3209"])
-nG3102_cpd = LinearGaussianCPD("G3102", [0.0684292379471164, 0.621190786431852], 0.44801587247782, evidence=["G3105"])
-nG3098_cpd = LinearGaussianCPD("G3098", [0.743390357698288, -0.355929413083383], 0.579002735095646, evidence=["G3105"])
-nG317_cpd = LinearGaussianCPD("G317", [0.275709228272321, 0.0759465020377335], 0.498391562534945, evidence=["G2639"])
-nG5167_cpd = LinearGaussianCPD("G5167", [0.195032198712052], 0.498391562534945, evidence=[])
-nG1778_cpd = LinearGaussianCPD("G1778", [0.862925482980681], 0.498391562534945, evidence=[])
-nG3872_cpd = LinearGaussianCPD("G3872", [0.655013799448022], 0.498391562534945, evidence=[])
-nG4529_cpd = LinearGaussianCPD("G4529", [0.377690802348335, 0.518846906518136], 0.626724392330099, evidence=["G4573"])
-nG1440_cpd = LinearGaussianCPD("G1440", [0.24655013799448], 0.626724392330099, evidence=[])
-nG5794_cpd = LinearGaussianCPD("G5794", [0.407119021134592, 0.142185170283766], 0.694102139394896, evidence=["G3925"])
-nG4668_cpd = LinearGaussianCPD("G4668", [0.209751609935603], 0.694102139394896, evidence=[])
-nG2764_cpd = LinearGaussianCPD("G2764", [0.112235510579577], 0.694102139394896, evidence=[])
-nG457_cpd = LinearGaussianCPD("G457", [0.508029197080289, -0.0898354940625336], 0.681900973118865, evidence=["G3823"])
-nG3862_cpd = LinearGaussianCPD("G3862", [0.187574740510341, 0.0702153078998277, -0.149372744655798, 0.251632811062151],
-                               0.36151806651654, evidence=["G3486", "G3823", "G3964"])
-nG3964_cpd = LinearGaussianCPD("G3964", [0.509659613615455], 0.36151806651654, evidence=[])
-nG4109_cpd = LinearGaussianCPD("G4109", [-0.00926295835653066, 0.115382746380024], 0.267711249872058, evidence=["G4156"])
-nG2089_cpd = LinearGaussianCPD("G2089", [0.482060717571297], 0.267711249872058, evidence=[])
-nG3219_cpd = LinearGaussianCPD("G3219", [0.685057471264363, 0.187425181418506], 0.92159165463882, evidence=["G4382"])
-nG3209_cpd = LinearGaussianCPD("G3209", [0.117716691874273, 0.56820032283839], 0.396698033616229, evidence=["G3219"])
-nG3222_cpd = LinearGaussianCPD("G3222", [1.76788371254195, -0.432641599518775, -0.427389367449246, -0.356516135178114],
-                               0.448856386694297, evidence=["G3219", "G3209", "G3212"])
-nG3212_cpd = LinearGaussianCPD("G3212", [0.231707317073169, 0.0790419331107485], 0.497046607383755, evidence=["G4145"])
-nG4573_cpd = LinearGaussianCPD("G4573", [0.119595216191352], 0.497046607383755, evidence=[])
-nG1311_cpd = LinearGaussianCPD("G1311", [0.0812425328554371, 0.271378733572282], 0.318093555544544, evidence=["G1378"])
-nG2949_cpd = LinearGaussianCPD("G2949", [0.176632934682613], 0.318093555544544, evidence=[])
-nG6003_cpd = LinearGaussianCPD("G6003", [0.128812487349105, -0.270804542100565], 0.338690266213264, evidence=["G5794"])
-nG6010_cpd = LinearGaussianCPD("G6010", [0.0633712879781598, 0.89058572222125], 0.136558143956734, evidence=["G6003"])
-nG6123_cpd = LinearGaussianCPD("G6123", [0.195032198712052], 0.136558143956734, evidence=[])
-nG2815_cpd = LinearGaussianCPD("G2815", [0.798528058877645], 0.136558143956734, evidence=[])
-nG3049_cpd = LinearGaussianCPD("G3049", [0.605335786568537], 0.136558143956734, evidence=[])
-nYLD_cpd = LinearGaussianCPD("YLD", [1.39158481713203, 0.0155233328954315, 0.0250098106927507, 0.363922234956395,
-                                     -0.0937468911811034, -0.0816901418378004, -0.097542589088556, -0.0571572464652664,
-                                     0.0724362946861047, 0.0900189399214589, -0.0869762226810977, 0.0413881229908341],
-                             0.217891050387141, evidence=["HT", "FT", "GW", "G4432", "G2670", "G4744", "G3092", "G1533",
-                                                          "G1888", "G1958", "G5006"])
-nCHALK_cpd = LinearGaussianCPD("CHALK", [-73.2446750180932, -0.28762981687607, -0.49993636861437, 4.25351595919279,
-                                         27.0623916778816, 0.455835379526158, 3.00861965267476, 1.22721849441071,
-                                         1.56526086732369, 1.90451703124662, 1.26403008392524], 77.544411474134,
-                               evidence=["FT", "AMY", "GL", "GW", "GTEMP", "G2764", "G3862", "G3964", "G4109", "G2089"])
-nBROWN_cpd = LinearGaussianCPD("BROWN", [11.4350053652224, 0.536364829221751, 1.34453421674466, 1.15557332306952,
-                                         -0.549679222525609, 0.325779851990496, 0.311593924835766, 0.213334905246134],
-                               8.72673995422895, evidence=["G5167", "G6003", "G6010", "G6123", "G2815",
-                                                           "G3049", "G2179"])
-nSUB_cpd = LinearGaussianCPD("SUB", [8.903139637578, 0.153931871571539, -0.326639075288049, -0.129180827856303,
-                                     -0.115305326620859, -0.427965548571368], 0.647089436333088,
-                             evidence=["G4529", "G4573", "G1311", "G2949", "G4553"])
-nG1888_cpd = LinearGaussianCPD("G1888", [0.141674333026679], 0.647089436333088, evidence=[])
-nG1958_cpd = LinearGaussianCPD("G1958", [0.253909843606256], 0.647089436333088, evidence=[])
-nG4156_cpd = LinearGaussianCPD("G4156", [0.763569457221711], 0.647089436333088, evidence=[])
-nG4382_cpd = LinearGaussianCPD("G4382", [0.399264029438822], 0.647089436333088, evidence=[])
-nG3136_cpd = LinearGaussianCPD("G3136", [0.877644894204232], 0.647089436333088, evidence=[])
-nG4145_cpd = LinearGaussianCPD("G4145", [0.383928571428565, 0.535746557659213], 0.687439382282256, evidence=["G4156"])
-nG3106_cpd = LinearGaussianCPD("G3106", [0.08398133748056, 0.930982304232692], 0.138403419796085, evidence=["G3105"])
-nG1266_cpd = LinearGaussianCPD("G1266", [0.233670653173873], 0.138403419796085, evidence=[])
-nG3927_cpd = LinearGaussianCPD("G3927", [0.388224471021159], 0.138403419796085, evidence=[])
-nG5997_cpd = LinearGaussianCPD("G5997", [0.877644894204232], 0.138403419796085, evidence=[])
-nG4553_cpd = LinearGaussianCPD("G4553", [0.373505059797608], 0.138403419796085, evidence=[])
-nG2179_cpd = LinearGaussianCPD("G2179", [0.489420423183073], 0.138403419796085, evidence=[])
-nG5006_cpd = LinearGaussianCPD("G5006", [0.776448942042318], 0.138403419796085, evidence=[])
-nG3992_cpd = LinearGaussianCPD("G3992", [0.228150873965041], 0.138403419796085, evidence=[])
-nG678_cpd = LinearGaussianCPD("G678", [0.252069917203312], 0.138403419796085, evidence=[])
-nG3925_cpd = LinearGaussianCPD("G3925", [0.34590616375345], 0.138403419796085, evidence=[])
+nHT_cpd = LinearGaussianCPD("HT", ["FT", "G3486", "G1533", "G4156", "G4382", "G678"],
+        [-1.35233341815215, 1.05636175438225, -1.07056485037116, 1.043027091355, -0.492561317337783,
+        -0.516613589615864, 4.20237584479626], 52.3676466180205)
+nFT_cpd = LinearGaussianCPD("FT", ["G1533", "G2639", "G3823", "G1378", "G3098", "G3136", "G4145"],
+        [91.2598629865165, 1.1440313508012, -0.249416855891503, 0.339953247290818, 0.42468294621476,
+        -0.255280813014823, 0.517271281551463, -0.3111428984492], 5.36451503082456)
+nAMY_cpd = LinearGaussianCPD("AMY", ["G3105", "G3102", "G3098", "G317", "G3106", "G1266"],
+        [22.6889556178845, -0.865160875707754, -0.206462120017453, 0.328734955712311, -0.289706009684452,
+        -0.444746533131511, -0.290480887948771], 2.36379481379116)
+nGL_cpd = LinearGaussianCPD("GL", ["G1778", "G3872", "G4529", "G1440", "G5794", "G4668", "G2764", "G3927", "G3992"],
+        [6.48066281698334, -0.276330265231098, 0.0378423810269304, -0.0671292229838255, -0.0656702393745024,
+        0.0455651992437016, 0.0487496267556403, -0.0937109972081314, 0.192679273274655, -0.0872267790902625],
+        0.104724643292958)
+nGW_cpd = LinearGaussianCPD("GW", ["GL", "GTEMP", "G4432", "G5794", "G2764", "G3927"],
+        [2.93710650429725, -0.095387290513827, -0.00251525234366862, -0.0972224870076159, 0.0153174923183445,
+        0.0969421193903015, -0.0673506031137825], 0.0166302302938114)
+nGTEMP_cpd = LinearGaussianCPD("GTEMP", ["AMY", "G3219", "G3209", "G3222", "G3212"],
+[81.8469452808735, -0.289507587781954, -1.99288858026669, -0.777421563956774, 1.4809583678463, 1.54996365108539],
+3.42443336652435)
+nG4432_cpd = LinearGaussianCPD("G4432", ["G1533"], [0.282208588957054, -0.0721387772371474], 0.394283647523444)
+nG2670_cpd = LinearGaussianCPD("G2670", ["G2815"], [0.214395099540582, 0.0817425423956083], 0.475587406298529)
+nG4744_cpd = LinearGaussianCPD("G4744", [], [0.139834406623735], 0.475587406298529)
+nG3092_cpd = LinearGaussianCPD("G3092", [], [0.266789328426863], 0.475587406298529)
+nG3486_cpd = LinearGaussianCPD("G3486", ["G3209"], [0.650544135429258, -0.132964375406939], 0.818014485417068)
+nG1533_cpd = LinearGaussianCPD("G1533", [], [0.800367985280589], 0.818014485417068)
+nG2639_cpd = LinearGaussianCPD("G2639", [], [0.921803127874885], 0.818014485417068)
+nG3823_cpd = LinearGaussianCPD("G3823", [], [0.739650413983441], 0.818014485417068)
+nG1378_cpd = LinearGaussianCPD("G1378", [], [0.459981600735971], 0.818014485417068)
+nG3105_cpd = LinearGaussianCPD("G3105", ["G3209"], [0.914147521160816, -0.20322760673426], 0.938146626163164)
+nG3102_cpd = LinearGaussianCPD("G3102", ["G3105"], [0.0684292379471164, 0.621190786431852], 0.44801587247782)
+nG3098_cpd = LinearGaussianCPD("G3098", ["G3105"], [0.743390357698288, -0.355929413083383], 0.579002735095646)
+nG317_cpd = LinearGaussianCPD("G317", ["G2639", "G6010"],
+        [0.275709228272321, 0.0759465020377335, -0.0725410730725793], 0.498391562534945)
+nG5167_cpd = LinearGaussianCPD("G5167", [], [0.195032198712052], 0.498391562534945)
+nG1778_cpd = LinearGaussianCPD("G1778", [], [0.862925482980681], 0.498391562534945)
+nG3872_cpd = LinearGaussianCPD("G3872", [], [0.655013799448022], 0.498391562534945)
+nG4529_cpd = LinearGaussianCPD("G4529", ["G4573"], [0.377690802348335, 0.518846906518136], 0.626724392330099)
+nG1440_cpd = LinearGaussianCPD("G1440", [], [0.24655013799448], 0.626724392330099)
+nG5794_cpd = LinearGaussianCPD("G5794", ["G3925"], [0.407119021134592, 0.142185170283766], 0.694102139394896)
+nG4668_cpd = LinearGaussianCPD("G4668", [], [0.209751609935603], 0.694102139394896)
+nG2764_cpd = LinearGaussianCPD("G2764", [], [0.112235510579577], 0.694102139394896)
+nG457_cpd = LinearGaussianCPD("G457", ["G3823"], [0.508029197080289, -0.0898354940625336], 0.681900973118865)
+nG3862_cpd = LinearGaussianCPD("G3862", ["G3486", "G3823", "G3964"],
+        [0.187574740510341, 0.0702153078998277, -0.149372744655798, 0.251632811062151], 0.36151806651654)
+nG3964_cpd = LinearGaussianCPD("G3964", [], [0.509659613615455], 0.36151806651654)
+nG4109_cpd = LinearGaussianCPD("G4109", ["G4156", "G4145"],
+        [-0.00926295835653066, 0.115382746380024, 0.109398093083679], 0.267711249872058)
+nG2089_cpd = LinearGaussianCPD("G2089", [], [0.482060717571297], 0.267711249872058)
+nG3219_cpd = LinearGaussianCPD("G3219", ["G4382"], [0.685057471264363, 0.187425181418506], 0.92159165463882)
+nG3209_cpd = LinearGaussianCPD("G3209", ["G3219", "G3212"],
+        [0.117716691874273, 0.56820032283839, -0.241535971037012], 0.396698033616229)
+nG3222_cpd = LinearGaussianCPD("G3222", ["G3219", "G3209", "G3212"],
+        [1.76788371254195, -0.432641599518775, -0.427389367449246, -0.356516135178114], 0.448856386694297)
+nG3212_cpd = LinearGaussianCPD("G3212", ["G4145"], [0.231707317073169, 0.0790419331107485], 0.497046607383755)
+nG4573_cpd = LinearGaussianCPD("G4573", [], [0.119595216191352], 0.497046607383755)
+nG1311_cpd = LinearGaussianCPD("G1311", ["G1378"], [0.0812425328554371, 0.271378733572282], 0.318093555544544)
+nG2949_cpd = LinearGaussianCPD("G2949", [], [0.176632934682613], 0.318093555544544)
+nG6003_cpd = LinearGaussianCPD("G6003", ["G5794", "G5997"],
+        [0.128812487349105, -0.270804542100565, 0.685848929909228], 0.338690266213264)
+nG6010_cpd = LinearGaussianCPD("G6010", ["G6003", "G5997"],
+        [0.0633712879781598, 0.89058572222125, 0.0600931166684637], 0.136558143956734)
+nG6123_cpd = LinearGaussianCPD("G6123", [], [0.195032198712052], 0.136558143956734)
+nG2815_cpd = LinearGaussianCPD("G2815", [], [0.798528058877645], 0.136558143956734)
+nG3049_cpd = LinearGaussianCPD("G3049", [], [0.605335786568537], 0.136558143956734)
+nYLD_cpd = LinearGaussianCPD("YLD", ["HT", "FT", "GW", "G4432", "G2670", "G4744", "G3092", "G1533", "G1888", "G1958", "G5006"],
+        [1.39158481713203, 0.0155233328954315, 0.0250098106927507, 0.363922234956395, -0.0937468911811034,
+        -0.0816901418378004, -0.097542589088556, -0.0571572464652664, 0.0724362946861047, 0.0900189399214589,
+        -0.0869762226810977, 0.0413881229908341], 0.217891050387141)
+nCHALK_cpd = LinearGaussianCPD("CHALK", ["FT", "AMY", "GL", "GW", "GTEMP", "G2764", "G3862", "G3964", "G4109", "G2089"],
+        [-73.2446750180932, -0.28762981687607, -0.49993636861437, 4.25351595919279, 27.0623916778816, 0.455835379526158,
+        3.00861965267476, 1.22721849441071, 1.56526086732369, 1.90451703124662, 1.26403008392524], 77.544411474134)
+nBROWN_cpd = LinearGaussianCPD("BROWN", ["G5167", "G6003", "G6010", "G6123", "G2815", "G3049", "G2179"],
+        [11.4350053652224, 0.536364829221751, 1.34453421674466, 1.15557332306952, -0.549679222525609, 0.325779851990496,
+        0.311593924835766, 0.213334905246134], 8.72673995422895)
+nSUB_cpd = LinearGaussianCPD("SUB", ["G4529", "G4573", "G1311", "G2949", "G4553"],
+        [8.903139637578, 0.153931871571539, -0.326639075288049, -0.129180827856303, -0.115305326620859,
+        -0.427965548571368], 0.647089436333088)
+nG1888_cpd = LinearGaussianCPD("G1888", [], [0.141674333026679], 0.647089436333088)
+nG1958_cpd = LinearGaussianCPD("G1958", [], [0.253909843606256], 0.647089436333088)
+nG4156_cpd = LinearGaussianCPD("G4156", [], [0.763569457221711], 0.647089436333088)
+nG4382_cpd = LinearGaussianCPD("G4382", [], [0.399264029438822], 0.647089436333088)
+nG3136_cpd = LinearGaussianCPD("G3136", [], [0.877644894204232], 0.647089436333088)
+nG4145_cpd = LinearGaussianCPD("G4145", ["G4156"], [0.383928571428565, 0.535746557659213], 0.687439382282256)
+nG3106_cpd = LinearGaussianCPD("G3106", ["G3105"], [0.08398133748056, 0.930982304232692], 0.138403419796085)
+nG1266_cpd = LinearGaussianCPD("G1266", [], [0.233670653173873], 0.138403419796085)
+nG3927_cpd = LinearGaussianCPD("G3927", [], [0.388224471021159], 0.138403419796085)
+nG5997_cpd = LinearGaussianCPD("G5997", [], [0.877644894204232], 0.138403419796085)
+nG4553_cpd = LinearGaussianCPD("G4553", [], [0.373505059797608], 0.138403419796085)
+nG2179_cpd = LinearGaussianCPD("G2179", [], [0.489420423183073], 0.138403419796085)
+nG5006_cpd = LinearGaussianCPD("G5006", [], [0.776448942042318], 0.138403419796085)
+nG3992_cpd = LinearGaussianCPD("G3992", [], [0.228150873965041], 0.138403419796085)
+nG678_cpd = LinearGaussianCPD("G678", [], [0.252069917203312], 0.138403419796085)
+nG3925_cpd = LinearGaussianCPD("G3925", [], [0.34590616375345], 0.138403419796085)
 
-magic_irri_true.add_cpds(nHT_cpd, nFT_cpd, nAMY_cpd, nGL_cpd, nGW_cpd, nGTEMP_cpd, nG4432_cpd, nG2670_cpd, nG4744_cpd,
-                         nG3092_cpd, nG3486_cpd, nG1533_cpd, nG2639_cpd, nG3823_cpd, nG1378_cpd, nG3105_cpd, nG3102_cpd,
-                         nG3098_cpd, nG317_cpd, nG5167_cpd, nG1778_cpd, nG3872_cpd, nG4529_cpd, nG1440_cpd, nG5794_cpd,
-                         nG4668_cpd, nG2764_cpd, nG457_cpd, nG3862_cpd, nG3964_cpd, nG4109_cpd, nG2089_cpd, nG3219_cpd,
-                         nG3209_cpd, nG3222_cpd, nG3212_cpd, nG4573_cpd, nG1311_cpd, nG2949_cpd, nG6003_cpd, nG6010_cpd,
-                         nG6123_cpd, nG2815_cpd, nG3049_cpd, nYLD_cpd, nCHALK_cpd, nBROWN_cpd, nSUB_cpd, nG1888_cpd,
-                         nG1958_cpd, nG4156_cpd, nG4382_cpd, nG3136_cpd, nG4145_cpd, nG3106_cpd, nG1266_cpd, nG3927_cpd,
-                         nG5997_cpd, nG4553_cpd, nG2179_cpd, nG5006_cpd, nG3992_cpd, nG678_cpd, nG3925_cpd)
+magic_irri_true.add_cpds([nHT_cpd, nFT_cpd, nAMY_cpd, nGL_cpd, nGW_cpd, nGTEMP_cpd, nG4432_cpd, nG2670_cpd,
+                        nG4744_cpd, nG3092_cpd, nG3486_cpd, nG1533_cpd, nG2639_cpd, nG3823_cpd, nG1378_cpd,
+                        nG3105_cpd, nG3102_cpd, nG3098_cpd, nG317_cpd, nG5167_cpd, nG1778_cpd, nG3872_cpd,
+                        nG4529_cpd, nG1440_cpd, nG5794_cpd, nG4668_cpd, nG2764_cpd, nG457_cpd, nG3862_cpd,
+                        nG3964_cpd, nG4109_cpd, nG2089_cpd, nG3219_cpd, nG3209_cpd, nG3222_cpd, nG3212_cpd,
+                        nG4573_cpd, nG1311_cpd, nG2949_cpd, nG6003_cpd, nG6010_cpd, nG6123_cpd, nG2815_cpd,
+                        nG3049_cpd, nYLD_cpd, nCHALK_cpd, nBROWN_cpd, nSUB_cpd, nG1888_cpd, nG1958_cpd,
+                        nG4156_cpd, nG4382_cpd, nG3136_cpd, nG4145_cpd, nG3106_cpd, nG1266_cpd, nG3927_cpd,
+                        nG5997_cpd, nG4553_cpd, nG2179_cpd, nG5006_cpd, nG3992_cpd, nG678_cpd, nG3925_cpd])
 
 
 
@@ -324,144 +331,192 @@ arth150_edges = [("20", "573"), ("47", "331"), ("47", "479"), ("47", "714"), ("4
                  ("783", "181"), ("783", "187"), ("783", "269"), ("783", "454"), ("783", "547"), ("783", "558"),
                  ("783", "640"), ("783", "679"), ("783", "781"), ("793", "47"), ("793", "479")]
 
-arth150_true = LinearGaussianBayesianNetwork(arth150_edges)
+arth150_true = GaussianNetwork(arth150_edges)
 
-n4_cpd = LinearGaussianCPD("4", [5.13221692640976, 0.207245010565492], 0.071019995476405, evidence=["539"])
-n8_cpd = LinearGaussianCPD("8", [9.30994790623257, -0.24860270093533], 0.0218655849729383, evidence=["209"])
-n13_cpd = LinearGaussianCPD("13", [0.986038672093577, 0.284842786046553], 0.0704362541328318, evidence=["331"])
-n20_cpd = LinearGaussianCPD("20", [1.25190416884291, 0.687788528829293], 0.116543092519117, evidence=["781"])
-n26_cpd = LinearGaussianCPD("26", [13.4678118709622, -0.874413974825955], 0.0351997309503873, evidence=["781"])
-n38_cpd = LinearGaussianCPD("38", [9.21145658746429, -0.386744281242008], 0.163184670502633, evidence=["570"])
-n47_cpd = LinearGaussianCPD("47", [-4.3126497816487, 0.233185890010486, 0.0751506826913552, 0.17492431985182,
-                                   0.485245376912763, 0.275297305148188],
-                            0.0472501068683382, evidence=["414", "422", "452", "629", "793"])
-n61_cpd = LinearGaussianCPD("61", [4.15397072356216, 0.0865964155925278], 0.063634368049145, evidence=["81"])
-n63_cpd = LinearGaussianCPD("63", [10.0413342237971, 0.356304236205956], 0.405633880741823, evidence=["198"])
-n78_cpd = LinearGaussianCPD("78", [11.4858794726779, -0.584838552544204], 0.0556219519493189, evidence=["726"])
-n81_cpd = LinearGaussianCPD("81", [4.94221373313185], 0.0556219519493189, evidence=[])
-n86_cpd = LinearGaussianCPD("86", [6.48588864267276, -0.300453221302049], 0.287286386852711, evidence=["738"])
-n93_cpd = LinearGaussianCPD("93", [8.40838955819168, -0.189602356426321], 0.0746828541065324, evidence=["539"])
-n96_cpd = LinearGaussianCPD("96", [2.97077609549616, 0.308056764866832], 0.383465281540997, evidence=["558"])
-n100_cpd = LinearGaussianCPD("100", [8.17279746533476], 0.383465281540997, evidence=[])
-n101_cpd = LinearGaussianCPD("101", [8.48127188327126, -0.174907641133027], 0.121045354753627, evidence=["443"])
-n108_cpd = LinearGaussianCPD("108", [-0.805661320784344, 0.1448781530259], 0.0347677839618535, evidence=["81"])
-n111_cpd = LinearGaussianCPD("111", [6.20907956398896, -0.0761636476173496, -0.100346495864312, 0.175883502341254],
-                             0.0311152787127874, evidence=["61", "81", "570"])
-n126_cpd = LinearGaussianCPD("126", [11.0125883505837, -0.372069029125872], 0.0312935077925673, evidence=["558"])
-n135_cpd = LinearGaussianCPD("135", [3.36122579363687, 0.287145953344763], 0.115889271916376, evidence=["570"])
-n144_cpd = LinearGaussianCPD("144", [9.9868123303278, -0.541294338124704], 0.223207800455315, evidence=["81"])
-n155_cpd = LinearGaussianCPD("155", [1.63235406071835, 0.774352043807013], 0.0414024177433643, evidence=["679"])
-n161_cpd = LinearGaussianCPD("161", [11.0593905320372, -0.816600571815393], 0.32506738961601, evidence=["558"])
-n181_cpd = LinearGaussianCPD("181", [4.00907191837132, 0.096421427993124], 0.0300055887470009, evidence=["86"])
-n187_cpd = LinearGaussianCPD("187", [6.8132347362773, -0.463306026666394], 0.468364282731012, evidence=["783"])
-n197_cpd = LinearGaussianCPD("197", [2.30798532701282, 0.660251542795961], 0.849156646005827, evidence=["539"])
-n198_cpd = LinearGaussianCPD("198", [5.46851291239798, 0.171197678112493], 0.0765310140692252, evidence=["81"])
-n209_cpd = LinearGaussianCPD("209", [11.5205718418854, -0.994543098183367], 0.0680160741348817, evidence=["738"])
-n211_cpd = LinearGaussianCPD("211", [5.96383521761649, -0.0692262943897494], 0.139840485164275, evidence=["81"])
-n219_cpd = LinearGaussianCPD("219", [5.15597621316629, 0.328107268961089], 0.0868809936775335, evidence=["570"])
-n226_cpd = LinearGaussianCPD("226", [7.58836953385411, -0.638719489611818], 0.375226743662716, evidence=["573"])
-n234_cpd = LinearGaussianCPD("234", [5.04551295011794, 0.0769594294326848], 0.111058983355224, evidence=["570"])
-n245_cpd = LinearGaussianCPD("245", [-5.85447945432617, 1.53468071420804], 0.0580871737585777, evidence=["100"])
-n248_cpd = LinearGaussianCPD("248", [6.77665578926069, -0.128224166958976], 0.282438113021501, evidence=["81"])
-n256_cpd = LinearGaussianCPD("256", [9.95382578579882, -0.465454016699282], 0.0768636698854487, evidence=["558"])
-n269_cpd = LinearGaussianCPD("269", [4.64721628217565, 0.0699590704197069], 0.0388738636119252, evidence=["558"])
-n272_cpd = LinearGaussianCPD("272", [9.80121542386809, -0.559084343647537, -0.132637659509937, 0.495697231445807,
-                                     0.478743043567024, -0.840077618467447],
-                             0.0529298416552907, evidence=["108", "414", "452", "603", "726"])
-n281_cpd = LinearGaussianCPD("281", [5.05072190240296, 0.277095487805601], 0.223738949451161, evidence=["627"])
-n289_cpd = LinearGaussianCPD("289", [11.7217579809144, -0.419487330928502, 0.461904803560402, 0.513362032455982,
-                                     -1.22235254889016], 0.212939404287164, evidence=["272", "414", "452", "726"])
-n296_cpd = LinearGaussianCPD("296", [-2.09319373125579, 1.23756425872497], 0.0859979101508777, evidence=["100"])
-n299_cpd = LinearGaussianCPD("299", [8.62862745696061, -0.468911323711237], 0.12241099633023, evidence=["444"])
-n328_cpd = LinearGaussianCPD("328", [-23.7220109808021, 3.92526812743412], 0.515687313048944, evidence=["519"])
-n331_cpd = LinearGaussianCPD("331", [-5.18093018187454, -0.245077428050169, 0.265560041117403, 0.815633066758885,
-                                     0.373612546731904, 0.600989542720327],
-                             0.109722618134356, evidence=["47", "414", "422", "452", "479"])
-n342_cpd = LinearGaussianCPD("342", [8.28752953715962, -0.422095538465701], 0.163030570831646, evidence=["558"])
-n360_cpd = LinearGaussianCPD("360", [7.93259061188443, 0.217399384000539], 0.172292194547835, evidence=["539"])
-n363_cpd = LinearGaussianCPD("363", [5.34818961270473, 0.237239781237156], 0.149782311189617, evidence=["558"])
-n368_cpd = LinearGaussianCPD("368", [3.74826998521852, 0.466257523756277], 0.209765396559226, evidence=["81"])
-n377_cpd = LinearGaussianCPD("377", [4.05895573977419, 0.38443987390742], 0.201384674063508, evidence=["81"])
-n378_cpd = LinearGaussianCPD("378", [6.33101923348009, -0.153503713992164], 0.120139218653909, evidence=["570"])
-n412_cpd = LinearGaussianCPD("412", [1.33581846950049, 0.900507352830968], 0.0466701658462005, evidence=["100"])
-n414_cpd = LinearGaussianCPD("414", [5.40717225350647], 0.0466701658462005, evidence=[])
-n422_cpd = LinearGaussianCPD("422", [6.51546624870884], 0.0466701658462005, evidence=[])
-n443_cpd = LinearGaussianCPD("443", [7.70663368873937, -0.22453700817252], 0.0243543777381277, evidence=["600"])
-n444_cpd = LinearGaussianCPD("444", [4.14765605847935, -0.183740978186997], 0.0173614703140944, evidence=["63"])
-n452_cpd = LinearGaussianCPD("452", [10.7528359458646, 0.326881164358891, -0.935228751480431, 0.117442519419941],
-                             0.0730057076577694, evidence=["414", "603", "726"])
-n454_cpd = LinearGaussianCPD("454", [7.09179692743507, -0.264340179498869], 0.0631321098189358, evidence=["783"])
-n460_cpd = LinearGaussianCPD("460", [8.53227260367057, -0.2733029882564], 0.156619671558706, evidence=["570"])
-n464_cpd = LinearGaussianCPD("464", [-1.69543463503609, 1.26102807895923], 0.97015980254461, evidence=["570"])
-n479_cpd = LinearGaussianCPD("479", [0.442842931010217, 0.676559377318471, -0.0744853527122266, 0.134729124303186,
-                                     0.395679802829294], 0.0775307609060693, evidence=["47", "422", "629", "793"])
-n480_cpd = LinearGaussianCPD("480", [2.55682959763745, 0.707909604341583], 0.0524317788700512, evidence=["61"])
-n496_cpd = LinearGaussianCPD("496", [-12.4819148553791, 3.04912504152943], 0.0931717972842992, evidence=["111"])
-n519_cpd = LinearGaussianCPD("519", [6.99410964700084], 0.0931717972842992, evidence=[])
-n537_cpd = LinearGaussianCPD("537", [-4.45835168615096, 1.7803710666228], 0.294350533498151, evidence=["111"])
-n539_cpd = LinearGaussianCPD("539", [7.79490579600327, -0.241983411421157], 0.17823034734507, evidence=["585"])
-n540_cpd = LinearGaussianCPD("540", [0.827654849604237, 0.875218850062147], 0.0544831154313224, evidence=["738"])
-n547_cpd = LinearGaussianCPD("547", [3.61535030989879, 0.314656637380729], 0.0903027674858787, evidence=["783"])
-n554_cpd = LinearGaussianCPD("554", [9.66208560365034, -0.424460363883557], 0.160889800385499, evidence=["570"])
-n558_cpd = LinearGaussianCPD("558", [6.24655275062898, 0.0180938449529089], 0.0944183946200041, evidence=["783"])
-n560_cpd = LinearGaussianCPD("560", [8.70561453114061, -0.0977301813911713, 0.084908389130142, -0.471933662869194],
-                             0.0183053258528039, evidence=["272", "627", "726"])
-n565_cpd = LinearGaussianCPD("565", [4.80253583125139, 0.599958566126897], 0.072445763335679, evidence=["443"])
-n570_cpd = LinearGaussianCPD("570", [5.70287957199369, 0.203003418842428], 0.127519704277035, evidence=["81"])
-n573_cpd = LinearGaussianCPD("573", [11.6569439309828, -0.813632642820017], 0.119452885299878, evidence=["20"])
-n576_cpd = LinearGaussianCPD("576", [5.0597555948259, 0.063101994671666], 0.201023380314383, evidence=["570"])
-n585_cpd = LinearGaussianCPD("585", [5.05826216631952, 0.0942808415481674], 0.235575161492576, evidence=["570"])
-n596_cpd = LinearGaussianCPD("596", [6.43451441508516, 0.212273624140478], 0.118283093388455, evidence=["539"])
-n598_cpd = LinearGaussianCPD("598", [1.24177364505092, 0.893096802318995], 0.447935367468969, evidence=["570"])
-n600_cpd = LinearGaussianCPD("600", [2.61065269844907, 0.791178376770996], 0.079191362590188, evidence=["699"])
-n603_cpd = LinearGaussianCPD("603", [4.28002526859063, 0.24788670872274], 0.0475867542273072, evidence=["781"])
-n622_cpd = LinearGaussianCPD("622", [8.83467154505365, -0.588978842982391], 0.125933612975896, evidence=["81"])
-n623_cpd = LinearGaussianCPD("623", [6.97430312780293, 0.443001534161568], 0.229730671684396, evidence=["570"])
-n627_cpd = LinearGaussianCPD("627", [13.4428529890321, -0.88092728101358], 0.356020917936932, evidence=["422"])
-n629_cpd = LinearGaussianCPD("629", [2.4470704463584, 0.967617681654345], 0.0722514532472718, evidence=["422"])
-n636_cpd = LinearGaussianCPD("636", [0.461606461235532, 0.427657924863574], 0.0818996717270977, evidence=["81"])
-n640_cpd = LinearGaussianCPD("640", [5.93700089515289, 0.0513397492219071], 0.0494107091120033, evidence=["783"])
-n651_cpd = LinearGaussianCPD("651", [5.06969868326223, 0.251318498283034], 0.147703384646662, evidence=["570"])
-n661_cpd = LinearGaussianCPD("661", [4.27778937404445, 0.278431770826615], 0.175648352100546, evidence=["627"])
-n665_cpd = LinearGaussianCPD("665", [7.81945134590937, -0.2001745620131], 0.104376628123879, evidence=["81"])
-n666_cpd = LinearGaussianCPD("666", [8.65438195938146, -0.661846491079126], 0.240897825172015, evidence=["81"])
-n677_cpd = LinearGaussianCPD("677", [-10.1786019127874, 0.0890978610584198], 0.287664273645993, evidence=["479"])
-n679_cpd = LinearGaussianCPD("679", [4.84797786225666, 0.176533762271773], 0.041251967806803, evidence=["783"])
-n686_cpd = LinearGaussianCPD("686", [4.72704309163414, -0.00662668915930714], 0.384590240590381, evidence=["198"])
-n699_cpd = LinearGaussianCPD("699", [2.85791232001986, 0.321226827548586], 0.170430424245343, evidence=["570"])
-n712_cpd = LinearGaussianCPD("712", [5.98313761413286, 0.268738412374275], 0.242338300069699, evidence=["81"])
-n714_cpd = LinearGaussianCPD("714", [-1.5193978690322, 0.147136239232107, -0.218117787296441, 0.616373915433572,
-                                     0.548842479322801, 0.0670757180009863, 0.0841691947314899],
-                             0.0331279054736412, evidence=["47", "331", "422", "452", "479", "629"])
-n726_cpd = LinearGaussianCPD("726", [7.09058175552775, -0.303666694423319], 0.0620382823318652, evidence=["414"])
-n736_cpd = LinearGaussianCPD("736", [2.13022608033984, 0.415830587298328], 0.0452981685732074, evidence=["47"])
-n738_cpd = LinearGaussianCPD("738", [4.56797268896957], 0.0452981685732074, evidence=[])
-n739_cpd = LinearGaussianCPD("739", [9.60604304591368, -0.244760114131359], 0.0921831308222444, evidence=["558"])
-n758_cpd = LinearGaussianCPD("758", [9.84344582797201, -0.68371754944285], 1.12101774153832, evidence=["539"])
-n767_cpd = LinearGaussianCPD("767", [12.0313573788774, -1.45911011687998], 0.160651271401927, evidence=["81"])
-n778_cpd = LinearGaussianCPD("778", [-4.68442962946919, 1.38774435963006], 5.45607441403459, evidence=["539"])
-n779_cpd = LinearGaussianCPD("779", [11.405146224642, -1.01781545806623], 0.0705678190502349, evidence=["198"])
-n781_cpd = LinearGaussianCPD("781", [4.38585807355185, 0.171854045544825], 0.0605351310735107, evidence=["783"])
-n783_cpd = LinearGaussianCPD("783", [3.61902790665421], 0.0605351310735107, evidence=[])
-n786_cpd = LinearGaussianCPD("786", [8.73940589138904, 0.0459896128005892, -0.14787022849101, 0.194572258153888],
-                             0.0182004071630795, evidence=["289", "414", "726"])
-n793_cpd = LinearGaussianCPD("793", [6.49724159775513, 0.486929082288803, -0.585632384189776, 0.282654408178769],
-                             0.0340233665518976, evidence=["81", "560", "629"])
-n798_cpd = LinearGaussianCPD("798", [7.22231951166242, 0.0565250888501066], 0.123276389951704, evidence=["779"])
+n4_cpd = LinearGaussianCPD("4", ["539"], [5.13221692640976, 0.207245010565492], 0.071019995476405)
+n8_cpd = LinearGaussianCPD("8", ["209"], [9.30994790623257, -0.24860270093533], 0.0218655849729383)
+n13_cpd = LinearGaussianCPD("13", ["331", "422"], [0.986038672093577, 0.284842786046553, 0.355520318370613],
+        0.0704362541328318)
+n20_cpd = LinearGaussianCPD("20", ["781"], [1.25190416884291, 0.687788528829293], 0.116543092519117)
+n26_cpd = LinearGaussianCPD("26", ["781"], [13.4678118709622, -0.874413974825955], 0.0351997309503873)
+n38_cpd = LinearGaussianCPD("38", ["570"], [9.21145658746429, -0.386744281242008], 0.163184670502633)
+n47_cpd = LinearGaussianCPD("47", ["414", "422", "452", "629", "793"],
+        [-4.3126497816487, 0.233185890010486, 0.0751506826913552, 0.17492431985182,
+        0.485245376912763, 0.275297305148188],
+        0.0472501068683382)
+n61_cpd = LinearGaussianCPD("61", ["81", "570"], [4.15397072356216, 0.0865964155925278, 0.212387966656128],
+        0.063634368049145)
+n63_cpd = LinearGaussianCPD("63", ["198", "738"], [10.0413342237971, 0.356304236205956, -1.79812938130697],
+        0.405633880741823)
+n78_cpd = LinearGaussianCPD("78", ["726"], [11.4858794726779, -0.584838552544204], 0.0556219519493189)
+n81_cpd = LinearGaussianCPD("81", [], [4.94221373313185], 0.0556219519493189)
+n86_cpd = LinearGaussianCPD("86", ["738"], [6.48588864267276, -0.300453221302049], 0.287286386852711)
+n93_cpd = LinearGaussianCPD("93", ["539"], [8.40838955819168, -0.189602356426321], 0.0746828541065324)
+n96_cpd = LinearGaussianCPD("96", ["558"], [2.97077609549616, 0.308056764866832], 0.383465281540997)
+n100_cpd = LinearGaussianCPD("100", [], [8.17279746533476], 0.383465281540997)
+n101_cpd = LinearGaussianCPD("101", ["443"], [8.48127188327126, -0.174907641133027], 0.121045354753627)
+n108_cpd = LinearGaussianCPD("108", ["81", "603"], [-0.805661320784344, 0.1448781530259, 1.04381678264641],
+        0.0347677839618535)
+n111_cpd = LinearGaussianCPD("111", ["61", "81", "570"],
+        [6.20907956398896, -0.0761636476173496, -0.100346495864312, 0.175883502341254],
+        0.0311152787127874)
+n126_cpd = LinearGaussianCPD("126", ["558", "783"],
+        [11.0125883505837, -0.372069029125872, 0.075887893233629],
+        0.0312935077925673)
+n135_cpd = LinearGaussianCPD("135", ["570"], [3.36122579363687, 0.287145953344763], 0.115889271916376)
+n144_cpd = LinearGaussianCPD("144", ["81"], [9.9868123303278, -0.541294338124704], 0.223207800455315)
+n155_cpd = LinearGaussianCPD("155", ["679"], [1.63235406071835, 0.774352043807013], 0.0414024177433643)
+n161_cpd = LinearGaussianCPD("161", ["558"], [11.0593905320372, -0.816600571815393], 0.32506738961601)
+n181_cpd = LinearGaussianCPD("181", ["86", "783"],
+        [4.00907191837132, 0.096421427993124, 0.244100778734592],
+        0.0300055887470009)
+n187_cpd = LinearGaussianCPD("187", ["783"], [6.8132347362773, -0.463306026666394], 0.468364282731012)
+n197_cpd = LinearGaussianCPD("197", ["539"], [2.30798532701282, 0.660251542795961], 0.849156646005827)
+n198_cpd = LinearGaussianCPD("198", ["81"], [5.46851291239798, 0.171197678112493], 0.0765310140692252)
+n209_cpd = LinearGaussianCPD("209", ["738"], [11.5205718418854, -0.994543098183367], 0.0680160741348817)
+n211_cpd = LinearGaussianCPD("211", ["81"], [5.96383521761649, -0.0692262943897494], 0.139840485164275)
+n219_cpd = LinearGaussianCPD("219", ["570"], [5.15597621316629, 0.328107268961089], 0.0868809936775335)
+n226_cpd = LinearGaussianCPD("226", ["573"], [7.58836953385411, -0.638719489611818], 0.375226743662716)
+n234_cpd = LinearGaussianCPD("234", ["570"], [5.04551295011794, 0.0769594294326848], 0.111058983355224)
+n245_cpd = LinearGaussianCPD("245", ["100"], [-5.85447945432617, 1.53468071420804], 0.0580871737585777)
+n248_cpd = LinearGaussianCPD("248", ["81"], [6.77665578926069, -0.128224166958976], 0.282438113021501)
+n256_cpd = LinearGaussianCPD("256", ["558", "570"],
+        [9.95382578579882, -0.465454016699282, -0.197494532861444],
+        0.0768636698854487)
+n269_cpd = LinearGaussianCPD("269", ["558", "783"],
+        [4.64721628217565, 0.0699590704197069, 0.226927297576542],
+        0.0388738636119252)
+n272_cpd = LinearGaussianCPD("272", ["108", "414", "452", "603", "726"],
+        [9.80121542386809, -0.559084343647537, -0.132637659509937, 0.495697231445807,
+        0.478743043567024, -0.840077618467447],
+        0.0529298416552907)
+n281_cpd = LinearGaussianCPD("281", ["627"], [5.05072190240296, 0.277095487805601], 0.223738949451161)
+n289_cpd = LinearGaussianCPD("289", ["272", "414", "452", "726"],
+        [11.7217579809144, -0.419487330928502, 0.461904803560402,
+        0.513362032455982, -1.22235254889016],
+        0.212939404287164)
+n296_cpd = LinearGaussianCPD("296", ["100"], [-2.09319373125579, 1.23756425872497], 0.0859979101508777)
+n299_cpd = LinearGaussianCPD("299", ["444"], [8.62862745696061, -0.468911323711237], 0.12241099633023)
+n328_cpd = LinearGaussianCPD("328", ["519"], [-23.7220109808021, 3.92526812743412], 0.515687313048944)
+n331_cpd = LinearGaussianCPD("331", ["47", "414", "422", "452", "479"],
+        [-5.18093018187454, -0.245077428050169, 0.265560041117403,
+        0.815633066758885, 0.373612546731904, 0.600989542720327],
+        0.109722618134356)
+n342_cpd = LinearGaussianCPD("342", ["558"], [8.28752953715962, -0.422095538465701], 0.163030570831646)
+n360_cpd = LinearGaussianCPD("360", ["539"], [7.93259061188443, 0.217399384000539], 0.172292194547835)
+n363_cpd = LinearGaussianCPD("363", ["558"], [5.34818961270473, 0.237239781237156], 0.149782311189617)
+n368_cpd = LinearGaussianCPD("368", ["81"], [3.74826998521852, 0.466257523756277], 0.209765396559226)
+n377_cpd = LinearGaussianCPD("377", ["81"], [4.05895573977419, 0.38443987390742], 0.201384674063508)
+n378_cpd = LinearGaussianCPD("378", ["570"], [6.33101923348009, -0.153503713992164], 0.120139218653909)
+n412_cpd = LinearGaussianCPD("412", ["100"], [1.33581846950049, 0.900507352830968], 0.0466701658462005)
+n414_cpd = LinearGaussianCPD("414", [], [5.40717225350647], 0.0466701658462005)
+n422_cpd = LinearGaussianCPD("422", [], [6.51546624870884], 0.0466701658462005)
+n443_cpd = LinearGaussianCPD("443", ["600"], [7.70663368873937, -0.22453700817252], 0.0243543777381277)
+n444_cpd = LinearGaussianCPD("444", ["63", "738"],
+        [4.14765605847935, -0.183740978186997, 0.469552318130069],
+        0.0173614703140944)
+n452_cpd = LinearGaussianCPD("452", ["414", "603", "726"],
+        [10.7528359458646, 0.326881164358891, -0.935228751480431, 0.117442519419941],
+        0.0730057076577694)
+n454_cpd = LinearGaussianCPD("454", ["783"], [7.09179692743507, -0.264340179498869], 0.0631321098189358)
+n460_cpd = LinearGaussianCPD("460", ["570"], [8.53227260367057, -0.2733029882564], 0.156619671558706)
+n464_cpd = LinearGaussianCPD("464", ["570"], [-1.69543463503609, 1.26102807895923], 0.97015980254461)
+n479_cpd = LinearGaussianCPD("479", ["47", "422", "629", "793"],
+        [0.442842931010217, 0.676559377318471, -0.0744853527122266, 0.134729124303186, 0.395679802829294],
+        0.0775307609060693)
+n480_cpd = LinearGaussianCPD("480", ["61", "738"],
+        [2.55682959763745, 0.707909604341583, 0.0244748062264572],
+        0.0524317788700512)
+n496_cpd = LinearGaussianCPD("496", ["111"],
+        [-12.4819148553791, 3.04912504152943],
+        0.0931717972842992)
+n519_cpd = LinearGaussianCPD("519", [], [6.99410964700084], 0.0931717972842992)
+n537_cpd = LinearGaussianCPD("537", ["111"], [-4.45835168615096, 1.7803710666228], 0.294350533498151)
+n539_cpd = LinearGaussianCPD("539", ["585"], [7.79490579600327, -0.241983411421157], 0.17823034734507)
+n540_cpd = LinearGaussianCPD("540", ["738"], [0.827654849604237, 0.875218850062147], 0.0544831154313224)
+n547_cpd = LinearGaussianCPD("547", ["783"], [3.61535030989879, 0.314656637380729], 0.0903027674858787)
+n554_cpd = LinearGaussianCPD("554", ["570"], [9.66208560365034, -0.424460363883557], 0.160889800385499)
+n558_cpd = LinearGaussianCPD("558", ["783"], [6.24655275062898, 0.0180938449529089], 0.0944183946200041)
+n560_cpd = LinearGaussianCPD("560", ["272", "627", "726"],
+        [8.70561453114061, -0.0977301813911713, 0.084908389130142, -0.471933662869194],
+        0.0183053258528039)
+n565_cpd = LinearGaussianCPD("565", ["443"], [4.80253583125139, 0.599958566126897], 0.072445763335679)
+n570_cpd = LinearGaussianCPD("570", ["81", "422"],
+        [5.70287957199369, 0.203003418842428, -0.210685597708211],
+        0.127519704277035)
+n573_cpd = LinearGaussianCPD("573", ["20", "443"],
+        [11.6569439309828, -0.813632642820017, -0.480003160129004],
+        0.119452885299878)
+n576_cpd = LinearGaussianCPD("576", ["570"], [5.0597555948259, 0.063101994671666], 0.201023380314383)
+n585_cpd = LinearGaussianCPD("585", ["570"], [5.05826216631952, 0.0942808415481674], 0.235575161492576)
+n596_cpd = LinearGaussianCPD("596", ["539"], [6.43451441508516, 0.212273624140478], 0.118283093388455)
+n598_cpd = LinearGaussianCPD("598", ["570"], [1.24177364505092, 0.893096802318995], 0.447935367468969)
+n600_cpd = LinearGaussianCPD("600", ["699"], [2.61065269844907, 0.791178376770996], 0.079191362590188)
+n603_cpd = LinearGaussianCPD("603", ["781"], [4.28002526859063, 0.24788670872274], 0.0475867542273072)
+n622_cpd = LinearGaussianCPD("622", ["81"], [8.83467154505365, -0.588978842982391], 0.125933612975896)
+n623_cpd = LinearGaussianCPD("623", ["570"], [6.97430312780293, 0.443001534161568], 0.229730671684396)
+n627_cpd = LinearGaussianCPD("627", ["422", "738"],
+        [13.4428529890321, -0.88092728101358, -0.334774874767957],
+        0.356020917936932)
+n629_cpd = LinearGaussianCPD("629", ["422"], [2.4470704463584, 0.967617681654345], 0.0722514532472718)
+n636_cpd = LinearGaussianCPD("636", ["81", "738"],
+        [0.461606461235532, 0.427657924863574, 0.517401936903162],
+        0.0818996717270977)
+n640_cpd = LinearGaussianCPD("640", ["783"], [5.93700089515289, 0.0513397492219071], 0.0494107091120033)
+n651_cpd = LinearGaussianCPD("651", ["570"], [5.06969868326223, 0.251318498283034], 0.147703384646662)
+n661_cpd = LinearGaussianCPD("661", ["627"], [4.27778937404445, 0.278431770826615], 0.175648352100546)
+n665_cpd = LinearGaussianCPD("665", ["81"], [7.81945134590937, -0.2001745620131], 0.104376628123879)
+n666_cpd = LinearGaussianCPD("666", ["81"], [8.65438195938146, -0.661846491079126], 0.240897825172015)
+n677_cpd = LinearGaussianCPD("677", ["479", "714"],
+        [-10.1786019127874, 0.0890978610584198, 2.07653206451276],
+        0.287664273645993)
+n679_cpd = LinearGaussianCPD("679", ["783"], [4.84797786225666, 0.176533762271773], 0.041251967806803)
+n686_cpd = LinearGaussianCPD("686", ["198"], [4.72704309163414, -0.00662668915930714], 0.384590240590381)
+n699_cpd = LinearGaussianCPD("699", ["570"], [2.85791232001986, 0.321226827548586], 0.170430424245343)
+n712_cpd = LinearGaussianCPD("712", ["81"], [5.98313761413286, 0.268738412374275], 0.242338300069699)
+n714_cpd = LinearGaussianCPD("714", ["47", "331", "422", "452", "479", "629"],
+        [-1.5193978690322, 0.147136239232107, -0.218117787296441, 0.616373915433572,
+        0.548842479322801, 0.0670757180009863, 0.0841691947314899],
+        0.0331279054736412)
+n726_cpd = LinearGaussianCPD("726", ["414"], [7.09058175552775, -0.303666694423319], 0.0620382823318652)
+n736_cpd = LinearGaussianCPD("736", ["47", "422"],
+        [2.13022608033984, 0.415830587298328, 0.601099800874187],
+        0.0452981685732074)
+n738_cpd = LinearGaussianCPD("738", [], [4.56797268896957], 0.0452981685732074)
+n739_cpd = LinearGaussianCPD("739", ["558"], [9.60604304591368, -0.244760114131359], 0.0921831308222444)
+n758_cpd = LinearGaussianCPD("758", ["539"], [9.84344582797201, -0.68371754944285], 1.12101774153832)
+n767_cpd = LinearGaussianCPD("767", ["81", "570"],
+        [12.0313573788774, -1.45911011687998, 0.0829056276018153],
+        0.160651271401927)
+n778_cpd = LinearGaussianCPD("778", ["539"], [-4.68442962946919, 1.38774435963006], 5.45607441403459)
+n779_cpd = LinearGaussianCPD("779", ["198"], [11.405146224642, -1.01781545806623], 0.0705678190502349)
+n781_cpd = LinearGaussianCPD("781", ["783"], [4.38585807355185, 0.171854045544825], 0.0605351310735107)
+n783_cpd = LinearGaussianCPD("783", [], [3.61902790665421], 0.0605351310735107)
+n786_cpd = LinearGaussianCPD("786", ["289", "414", "726"],
+        [8.73940589138904, 0.0459896128005892, -0.14787022849101, 0.194572258153888],
+        0.0182004071630795)
+n793_cpd = LinearGaussianCPD("793", ["81", "560", "629"],
+        [6.49724159775513, 0.486929082288803, -0.585632384189776, 0.282654408178769],
+        0.0340233665518976)
+n798_cpd = LinearGaussianCPD("798", ["779"], [7.22231951166242, 0.0565250888501066], 0.123276389951704)
+
+arth150_true.add_cpds([n4_cpd, n8_cpd, n13_cpd, n20_cpd, n26_cpd, n38_cpd, n47_cpd, n61_cpd,
+                       n63_cpd, n78_cpd, n81_cpd, n86_cpd, n93_cpd, n96_cpd, n100_cpd, n101_cpd,
+                       n108_cpd, n111_cpd, n126_cpd, n135_cpd,n144_cpd, n155_cpd, n161_cpd, n181_cpd,
+                       n187_cpd, n197_cpd, n198_cpd, n209_cpd, n211_cpd, n219_cpd,n226_cpd, n234_cpd,
+                       n245_cpd, n248_cpd, n256_cpd, n269_cpd, n272_cpd, n281_cpd, n289_cpd, n296_cpd,
+                       n299_cpd, n328_cpd, n331_cpd, n342_cpd, n360_cpd, n363_cpd, n368_cpd, n377_cpd,
+                       n378_cpd, n412_cpd, n414_cpd, n422_cpd, n443_cpd, n444_cpd, n452_cpd, n454_cpd,
+                       n460_cpd, n464_cpd, n479_cpd, n480_cpd, n496_cpd, n519_cpd, n537_cpd, n539_cpd,
+                       n540_cpd, n547_cpd, n554_cpd, n558_cpd, n560_cpd, n565_cpd, n570_cpd, n573_cpd,
+                       n576_cpd, n585_cpd, n596_cpd, n598_cpd, n600_cpd, n603_cpd, n622_cpd, n623_cpd,
+                       n627_cpd, n629_cpd, n636_cpd, n640_cpd, n651_cpd, n661_cpd, n665_cpd, n666_cpd,
+                       n677_cpd, n679_cpd, n686_cpd, n699_cpd, n712_cpd, n714_cpd, n726_cpd, n736_cpd,
+                       n738_cpd, n739_cpd, n758_cpd, n767_cpd, n778_cpd, n779_cpd, n781_cpd, n783_cpd,
+                       n786_cpd, n793_cpd, n798_cpd])
 
 
-arth150_true.add_cpds(n4_cpd, n8_cpd, n13_cpd, n20_cpd, n26_cpd, n38_cpd, n47_cpd, n61_cpd, n63_cpd, n78_cpd, n81_cpd, n86_cpd,
-         n93_cpd, n96_cpd, n100_cpd, n101_cpd, n108_cpd, n111_cpd, n126_cpd, n135_cpd, n144_cpd, n155_cpd, n161_cpd,
-         n181_cpd, n187_cpd, n197_cpd, n198_cpd, n209_cpd, n211_cpd, n219_cpd, n226_cpd, n234_cpd, n245_cpd, n248_cpd,
-         n256_cpd, n269_cpd, n272_cpd, n281_cpd, n289_cpd, n296_cpd, n299_cpd, n328_cpd, n331_cpd, n342_cpd, n360_cpd,
-         n363_cpd, n368_cpd, n377_cpd, n378_cpd, n412_cpd, n414_cpd, n422_cpd, n443_cpd, n444_cpd, n452_cpd, n454_cpd,
-         n460_cpd, n464_cpd, n479_cpd, n480_cpd, n496_cpd, n519_cpd, n537_cpd, n539_cpd, n540_cpd, n547_cpd, n554_cpd,
-         n558_cpd, n560_cpd, n565_cpd, n570_cpd, n573_cpd, n576_cpd, n585_cpd, n596_cpd, n598_cpd, n600_cpd, n603_cpd,
-         n622_cpd, n623_cpd, n627_cpd, n629_cpd, n636_cpd, n640_cpd, n651_cpd, n661_cpd, n665_cpd, n666_cpd, n677_cpd,
-         n679_cpd, n686_cpd, n699_cpd, n712_cpd, n714_cpd, n726_cpd, n736_cpd, n738_cpd, n739_cpd, n758_cpd, n767_cpd,
-         n778_cpd, n779_cpd, n781_cpd, n783_cpd, n786_cpd, n793_cpd, n798_cpd)
-
-ecoli70_true.save_model('ecoli70.pkl', save_parameters=True)
-magic_niab_true.save_model('magic_niab.pkl', save_parameters=True)
-magic_irri_true.save_model('magic_irri.pkl', save_parameters=True)
-arth150_true.save_model('arth150.pkl', save_parameters=True)
+ecoli70_true.save('ecoli70.pickle', include_cpd=True)
+magic_niab_true.save('magic_niab.pickle', include_cpd=True)
+magic_irri_true.save('magic_irri.pickle', include_cpd=True)
+arth150_true.save('arth150.pickle', include_cpd=True)

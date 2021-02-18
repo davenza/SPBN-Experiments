@@ -5,6 +5,11 @@ import pandas as pd
 from sklearn.model_selection import KFold
 from pybnesian.learning.scores import ValidatedLikelihood
 
+SEED = 0
+EVALUATION_FOLDS = 10
+TRAINING_FOLDS = [10]
+PATIENCE = [0, 5]
+
 def find_crossvalidation_datasets():
     csv_files = glob.glob('data/**/*.csv')
 
@@ -15,33 +20,15 @@ def find_crossvalidation_datasets():
     csv_files = sorted(csv_files)
     return csv_files
 
-def find_hold_out_datasets():
-    csv_files = glob.glob('data/**/*.csv')
-
-    tra_files = list(filter(lambda n: os.path.splitext(os.path.basename(n))[0].endswith("_tra"), csv_files))
-    tes_files = list(filter(lambda n: os.path.splitext(os.path.basename(n))[0].endswith("_tes"), csv_files))
-
-    set_tra = set([f[:-4] for f in tra_files])
-    set_tes = set([f[:-4] for f in tes_files])
-
-    if set_tra != set_tes:
-        raise FileNotFoundError("The test/training files did not match.\nTraining files: " + str(tra_files)
-                                + "\nTest files: " + str(tes_files))
-
-    tra_files = sorted(tra_files)
-    tes_files = sorted(tes_files)
-    return tra_files, tes_files
-
-
 def remove_crossvalidated_nan(dataset, folds):
     to_delete = set()
 
     # Outer for: Performance CV
-    for (idx_fold, (train_indices, test_indices)) in enumerate(KFold(10, shuffle=True, random_state=0).split(dataset)):
+    for (idx_fold, (train_indices, test_indices)) in enumerate(KFold(EVALUATION_FOLDS, shuffle=True, random_state=SEED).split(dataset)):
         train_data = dataset.iloc[train_indices,:]
         # Inner for: Validation CV
         for k in folds:
-            vl = ValidatedLikelihood(train_data, k=k, seed=0)
+            vl = ValidatedLikelihood(train_data, k=k, seed=SEED)
             for (train_fold, _) in vl.cv_lik.cv:
                 train_fold_pandas = train_fold.to_pandas()
                 d = train_fold_pandas.columns[np.isclose(train_fold_pandas.var(), 0)].tolist()

@@ -36,7 +36,7 @@ print_cpds <- function(bn.fit) {
       beta <- paste0("[", bn.fit[[node]]$coefficients[["(Intercept)"]], ", ", bn.fit[[node]]$coefficients[[first_parent]])
       parents <- paste0("[\"", first_parent, "\"")
       
-      if (n_parents > 2) {
+      if (n_parents > 1) {
         for (parent in bn.fit[[node]]$parents[2:n_parents]) {
           beta <- paste0(beta, ", ", bn.fit[[node]]$coefficients[[parent]])
           parents <- paste0(parents, ", \"", parent, "\"")
@@ -49,7 +49,7 @@ print_cpds <- function(bn.fit) {
       variance <- bn.fit[[node]]$sd**2
     }
 
-    cat(paste0("n", node, "_cpd = LinearGaussianCPD(",  name, ", ", beta, ", ", variance, ", ", "evidence=", parents, ")\n"))
+    cat(paste0("n", node, "_cpd = LinearGaussianCPD(",  name, ", ", parents, ", ", beta, ", ", variance, ")\n"))
   }
   
   add <- paste0("add_cpds(n", names(bn.fit)[1], "_cpd")

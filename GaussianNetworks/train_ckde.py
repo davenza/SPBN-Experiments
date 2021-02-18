@@ -53,13 +53,13 @@ for d in datasets:
             with open(result_folder + '/end.lock', 'w') as f:
                 pass
 
-        result_folder = 'models/' + d + '/' + str(i) + '/GBN_BGe/'
-        if not os.path.exists(result_folder + '/end.lock'):
-            pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
-            bge = BGeScore(df)
-            ghc = CachedHillClimbing(df, scoring_method=bge)
-            cb_draw = DrawModel(result_folder)
-            cb_save = SaveModel(result_folder)
-            gbn = ghc.estimate(callbacks=[cb_draw, cb_save])
-            with open(result_folder + '/end.lock', 'w') as f:
-                pass
+        # result_folder = 'models/' + d + '/' + str(i) + '/GBN_BGe/'
+        # if not os.path.exists(result_folder + '/end.lock'):
+        #     pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
+        #     bge = BGeScore(df)
+        #     ghc = CachedHillClimbing(df, scoring_method=bge)
+        #     cb_draw = DrawModel(result_folder)
+        #     cb_save = SaveModel(result_folder)
+        #     gbn = ghc.estimate(callbacks=[cb_draw, cb_save])
+        #     with open(result_folder + '/end.lock', 'w') as f:
+        #         pass

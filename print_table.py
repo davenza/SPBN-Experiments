@@ -8,7 +8,7 @@ def print_datasets():
 
     for dataset in datasets:
         basefolder = os.path.basename(os.path.dirname(dataset))
-        x = experiments_helper.validate_dataset(dataset, [2, 3, 5, 10])
+        x = experiments_helper.validate_dataset(dataset, experiments_helper.TRAINING_FOLDS)
         if x is None:
             continue
         else:
