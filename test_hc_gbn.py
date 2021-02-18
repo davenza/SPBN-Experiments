@@ -53,9 +53,9 @@ def test_crossvalidation():
         else:
             dataset, result_folder = x
 
-        validation_gaussian = np.full((10, len(folds), len(patience)), np.nan)
-        bic_gaussian = np.full((10,), np.nan)
-        bge_gaussian = np.full((10,), np.nan)
+        validation_gaussian = np.full((experiments_helper.EVALUATION_FOLDS, len(folds), len(patience)), np.nan)
+        bic_gaussian = np.full((experiments_helper.EVALUATION_FOLDS,), np.nan)
+        bge_gaussian = np.full((experiments_helper.EVALUATION_FOLDS,), np.nan)
 
         for (idx_fold, (train_indices, test_indices)) in enumerate(KFold(experiments_helper.EVALUATION_FOLDS, shuffle=True, 
                                                                    random_state=experiments_helper.SEED).split(dataset)):
@@ -84,7 +84,7 @@ def test_crossvalidation():
 
         string_file += '\n' + new_line
 
-    with open('results_gbn.csv', 'w') as f:
+    with open('results_hc_gbn.csv', 'w') as f:
         f.write(string_file)
 
 test_crossvalidation()

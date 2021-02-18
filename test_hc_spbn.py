@@ -25,7 +25,7 @@ def test_crossvalidation():
     folds = experiments_helper.TRAINING_FOLDS
     patience = experiments_helper.PATIENCE
 
-    string_file = "Dataset," + ','.join(["SPBN_Validation_"+ str(f) + "_" + str(p) for f in folds for p in patience])
+    string_file = "Dataset," + ','.join(["SPBN_Validation_" + str(f) + "_" + str(p) for f in folds for p in patience])
 
     print(string_file)
     for file in files:
@@ -35,7 +35,7 @@ def test_crossvalidation():
         else:
             dataset, result_folder = x
 
-        spbn_score = np.full((10, len(folds), len(patience)), np.nan)
+        spbn_score = np.full((experiments_helper.EVALUATION_FOLDS, len(folds), len(patience)), np.nan)
 
         for (idx_fold, (train_indices, test_indices)) in enumerate(KFold(experiments_helper.EVALUATION_FOLDS, shuffle=True, 
                                                                    random_state=experiments_helper.SEED).split(dataset)):
@@ -58,7 +58,7 @@ def test_crossvalidation():
 
         string_file += '\n' + new_line
 
-    with open('results_spbn.csv', 'w') as f:
+    with open('results_hc_spbn.csv', 'w') as f:
         f.write(string_file)
 
 test_crossvalidation()
