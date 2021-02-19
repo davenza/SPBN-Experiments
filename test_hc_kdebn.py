@@ -2,7 +2,7 @@ import glob
 import os
 import numpy as np
 import experiments_helper
-from pybnesian.models import load_model
+from pybnesian import load
 
 from sklearn.model_selection import KFold
 
@@ -13,7 +13,7 @@ def test_validation_kdebn(train_data, test_data, folds, patience, result_folder,
         for idx_p, p in enumerate(patience):
             models_folder = result_folder + '/HillClimbing/KDEBN/Validation_' + str(k) + "_" + str(p) + '/' + str(idx_fold)
             all_models = sorted(glob.glob(models_folder + '/*.pickle'))
-            final_model = load_model(all_models[-1])
+            final_model = load(all_models[-1])
             final_model.fit(train_data)
             test_scores[idx_k, idx_p] = final_model.slogl(test_data)
 

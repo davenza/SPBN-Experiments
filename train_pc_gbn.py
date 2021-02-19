@@ -2,7 +2,7 @@ import os
 import experiments_helper
 import pathlib
 import multiprocessing as mp
-from pybnesian.graph import load_graph
+from pybnesian import load
 from pybnesian.models import GaussianNetwork
 
 
@@ -28,7 +28,7 @@ def run_pc_lc_gbn(train_data, folds, patience, result_folder, idx_fold):
     fold_folder = result_folder + '/PC/Gaussian/LinearCorrelation/' + str(idx_fold)
     pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
-    pdag = load_graph(result_folder + '/PC/graph-lc-'+ str(idx_fold) + ".pickle")
+    pdag = load(result_folder + '/PC/graph-lc-'+ str(idx_fold) + ".pickle")
 
     try:
         dag = pdag.to_dag()
@@ -42,7 +42,7 @@ def run_pc_kmi_gbn(train_data, folds, patience, result_folder, idx_fold):
     fold_folder = result_folder + '/PC/Gaussian/KMutualInformation/' + str(idx_fold)
     pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
-    pdag = load_graph(result_folder + '/PC/graph-kmi-'+ str(idx_fold) + ".pickle")
+    pdag = load(result_folder + '/PC/graph-kmi-'+ str(idx_fold) + ".pickle")
 
     try:
         dag = pdag.to_dag()

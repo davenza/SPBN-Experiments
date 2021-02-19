@@ -2,7 +2,7 @@ import os
 import experiments_helper
 import pathlib
 import multiprocessing as mp
-from pybnesian.graph import load_graph
+from pybnesian.graph import load
 from pybnesian.models import KDENetwork
 
 
@@ -28,7 +28,7 @@ def run_pc_lc_kdebn(train_data, folds, patience, result_folder, idx_fold):
     fold_folder = result_folder + '/PC/KDEBN/LinearCorrelation/' + str(idx_fold)
     pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
-    pdag = load_graph(result_folder + '/PC/graph-lc-'+ str(idx_fold) + ".pickle")
+    pdag = load(result_folder + '/PC/graph-lc-'+ str(idx_fold) + ".pickle")
 
     try:
         dag = pdag.to_dag()
@@ -42,7 +42,7 @@ def run_pc_kmi_kdebn(train_data, folds, patience, result_folder, idx_fold):
     fold_folder = result_folder + '/PC/KDEBN/KMutualInformation/' + str(idx_fold)
     pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
-    pdag = load_graph(result_folder + '/PC/graph-kmi-'+ str(idx_fold) + ".pickle")
+    pdag = load(result_folder + '/PC/graph-kmi-'+ str(idx_fold) + ".pickle")
 
     try:
         dag = pdag.to_dag()

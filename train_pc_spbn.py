@@ -2,7 +2,7 @@ import os
 import experiments_helper
 import pathlib
 import multiprocessing as mp
-from pybnesian.graph import load_graph
+from pybnesian import load
 from pybnesian.learning.algorithms import GreedyHillClimbing, PC
 from pybnesian.learning.algorithms.callbacks import SaveModel
 from pybnesian.learning.operators import OperatorPool, ArcOperatorSet, ChangeNodeTypeSet
@@ -33,7 +33,7 @@ def run_pc_lc_spbn(train_data, folds, patience, result_folder, idx_fold):
     hc = GreedyHillClimbing()
     change_node_type = ChangeNodeTypeSet()
 
-    pdag = load_graph(result_folder + '/PC/graph-lc-'+ str(idx_fold) + ".pickle")
+    pdag = load(result_folder + '/PC/graph-lc-'+ str(idx_fold) + ".pickle")
 
     try:
         dag = pdag.to_dag()
@@ -61,7 +61,7 @@ def run_pc_kmi_spbn(train_data, folds, patience, result_folder, idx_fold):
     hc = GreedyHillClimbing()
     change_node_type = ChangeNodeTypeSet()
 
-    pdag = load_graph(result_folder + '/PC/graph-kmi-'+ str(idx_fold) + ".pickle")
+    pdag = load(result_folder + '/PC/graph-kmi-'+ str(idx_fold) + ".pickle")
 
     try:
         dag = pdag.to_dag()
