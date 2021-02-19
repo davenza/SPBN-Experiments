@@ -1,63 +1,11 @@
 import numpy as np
 import pandas as pd
 import glob
-
+from pybnesian import load
 import matplotlib.pyplot as plt
-from pgmpy.models import HybridContinuousModel, LinearGaussianBayesianNetwork
-from pgmpy.factors.continuous import NodeType
+import experiments_helper
 
 import tikzplotlib
-
-def shd(estimated, true):
-    assert set(estimated.nodes) == set(true.nodes)
-    shd_value = 0
-
-    estimated_edges = set(estimated.edges)
-    true_edges = set(true.edges)
-
-    for est_edge in estimated_edges:
-        if est_edge not in true.edges:
-            shd_value += 1
-            s, d = est_edge
-            if (d, s) in true_edges:
-                true_edges.remove((d, s))
-
-    for true_edge in true_edges:
-        if true_edge not in estimated_edges:
-            shd_value += 1
-
-    return shd_value
-
-def hamming(estimated, true):
-    assert set(estimated.nodes) == set(true.nodes)
-    hamming_value = 0
-
-    estimated_edges = set(estimated.edges)
-    true_edges = set(true.edges)
-
-    for est_edge in estimated_edges:
-        if est_edge not in true.edges:
-            s, d = est_edge
-            if (d, s) in true_edges:
-                true_edges.remove((d,s))
-            else:
-                hamming_value += 1
-
-    for true_edge in true_edges:
-        if true_edge not in estimated_edges:
-            hamming_value += 1
-
-    return hamming_value
-
-def hamming_type(estimated, true):
-    assert set(estimated.nodes) == set(true.nodes)
-    hamming_value = 0
-
-    for n in true.nodes:
-        if estimated.node_type[n] == NodeType.CKDE:
-            hamming_value += 1
-
-    return hamming_value
 
 ecoli70_200 = pd.read_csv("ecoli70_200.csv")
 ecoli70_2000 = pd.read_csv("ecoli70_2000.csv")
@@ -79,10 +27,10 @@ arth150_2000 = pd.read_csv("arth150_2000.csv")
 arth150_10000 = pd.read_csv("arth150_10000.csv")
 arth150_test = pd.read_csv("arth150_test.csv")
 
-ecoli70_true = LinearGaussianBayesianNetwork.load_model('ecoli70.pkl')
-magic_niab_true = LinearGaussianBayesianNetwork.load_model('magic_niab.pkl')
-magic_irri_true = LinearGaussianBayesianNetwork.load_model('magic_irri.pkl')
-arth150_true = LinearGaussianBayesianNetwork.load_model('arth150.pkl')
+ecoli70_true = load('ecoli70.pickle')
+magic_niab_true = load('magic_niab.pickle')
+magic_irri_true = load('magic_irri.pickle')
+arth150_true = load('arth150.pickle')
 
 # COLOR1 = "#B5EA7F"
 # COLOR2 = "#739DF6"
@@ -92,93 +40,93 @@ COLOR3 = "#B5EA7F"
 COLOR4 = "#00000080"
 
 def extract_info(train_datasets, test_datasets, model_folders, true_models):
-    patience = [0, 5]
+    patience = experiments_helper.PATIENCE
 
-    logl_true = np.empty((len(train_datasets,)))
-    logl_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
-    logl_gbn_val = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
-    logl_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
-    logl_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
+    slogl_true = np.empty((len(train_datasets,)))
+    slogl_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    slogl_gbn_val = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    slogl_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
+    slogl_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
 
-    hmd_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    hmd_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
     hmd_gbn_val = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
     hmd_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
     hmd_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
 
-    shd_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    shd_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
     shd_gbn_val = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
     shd_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
     shd_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
 
-    thd_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    thd_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
 
     for idx_dataset, (instance_datasets, test_data, dataset_folders, true_model) in enumerate(
             zip(train_datasets, test_datasets, model_folders, true_models)):
         for idx_instances, (training_data, folder) in enumerate(zip(instance_datasets, dataset_folders)):
 
-            logl_true[idx_dataset] = true_model.logpdf_dataset(test_data).sum()
+            slogl_true[idx_dataset] = true_model.slogl(test_data)
             for idx_p, p in enumerate(patience):
-                ckde_folder = folder + '/CKDE/' + str(p)
+                ckde_folder = folder + '/SPBN/' + str(p)
 
-                all_models = sorted(glob.glob(ckde_folder + '/*.pkl'))
+                all_models = sorted(glob.glob(ckde_folder + '/*.pickle'))
                 final_model = all_models[-1]
 
-                hcm = HybridContinuousModel.load_model(final_model)
-                hcm.fit(training_data)
+                spbn = load(final_model)
+                spbn.fit(training_data)
 
-                logl_ckde[idx_dataset, idx_instances, idx_p] = hcm.logpdf_dataset(test_data).sum()
-                hmd_ckde[idx_dataset, idx_instances, idx_p] = hamming(hcm, true_model)
-                shd_ckde[idx_dataset, idx_instances, idx_p] = shd(hcm, true_model)
-                thd_ckde[idx_dataset, idx_instances, idx_p] = hamming_type(hcm, true_model)
+                slogl_spbn[idx_dataset, idx_instances, idx_p] = spbn.slogl(test_data)
+                hmd_spbn[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming(spbn, true_model)
+                shd_spbn[idx_dataset, idx_instances, idx_p] = experiments_helper.shd(spbn, true_model)
+                thd_spbn[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming_type(spbn, true_model)
 
             for idx_p, p in enumerate(patience):
                 gbn_val_folder = folder + '/GBN_Validation/' + str(p)
 
-                all_models = sorted(glob.glob(gbn_val_folder + '/*.pkl'))
+                all_models = sorted(glob.glob(gbn_val_folder + '/*.pickle'))
                 final_model = all_models[-1]
 
-                lbn = LinearGaussianBayesianNetwork.load_model(final_model)
-                lbn.fit(training_data)
+                gbn = load(final_model)
+                gbn.fit(training_data)
 
-                logl_gbn_val[idx_dataset, idx_instances, idx_p] = lbn.logpdf_dataset(test_data).sum()
-                hmd_gbn_val[idx_dataset, idx_instances, idx_p] = hamming(lbn, true_model)
-                shd_gbn_val[idx_dataset, idx_instances, idx_p] = shd(lbn, true_model)
+                slogl_gbn_val[idx_dataset, idx_instances, idx_p] = gbn.slogl(test_data)
+                hmd_gbn_val[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming(gbn, true_model)
+                shd_gbn_val[idx_dataset, idx_instances, idx_p] = experiments_helper.shd(gbn, true_model)
 
             gbn_bic_folder = folder + '/GBN_BIC/'
 
-            all_models = sorted(glob.glob(gbn_bic_folder + '/*.pkl'))
+            all_models = sorted(glob.glob(gbn_bic_folder + '/*.pickle'))
             final_model = all_models[-1]
 
-            lbn = LinearGaussianBayesianNetwork.load_model(final_model)
-            lbn.fit(training_data)
+            gbn = load(final_model)
+            gbn.fit(training_data)
 
-            logl_gbn_bic[idx_dataset, idx_instances] = lbn.logpdf_dataset(test_data).sum()
-            hmd_gbn_bic[idx_dataset, idx_instances] = hamming(lbn, true_model)
-            shd_gbn_bic[idx_dataset, idx_instances] = shd(lbn, true_model)
+            slogl_gbn_bic[idx_dataset, idx_instances] = gbn.slogl(test_data)
+            hmd_gbn_bic[idx_dataset, idx_instances] = experiments_helper.hamming(gbn, true_model)
+            shd_gbn_bic[idx_dataset, idx_instances] = experiments_helper.shd(gbn, true_model)
 
             gbn_bge_folder = folder + '/GBN_BGe/'
 
-            all_models = sorted(glob.glob(gbn_bge_folder + '/*.pkl'))
+            all_models = sorted(glob.glob(gbn_bge_folder + '/*.pickle'))
             final_model = all_models[-1]
 
-            lbn = LinearGaussianBayesianNetwork.load_model(final_model)
-            lbn.fit(training_data)
+            gbn = load(final_model)
+            gbn.fit(training_data)
 
-            logl_gbn_bge[idx_dataset, idx_instances] = lbn.logpdf_dataset(test_data).sum()
-            hmd_gbn_bge[idx_dataset, idx_instances] = hamming(lbn, true_model)
-            shd_gbn_bge[idx_dataset, idx_instances] = shd(lbn, true_model)
+            slogl_gbn_bge[idx_dataset, idx_instances] = gbn.slogl(test_data)
+            hmd_gbn_bge[idx_dataset, idx_instances] = experiments_helper.hamming(gbn, true_model)
+            shd_gbn_bge[idx_dataset, idx_instances] = experiments_helper.shd(gbn, true_model)
 
-    return (logl_true, logl_ckde, logl_gbn_val, logl_gbn_bic, logl_gbn_bge), \
-           (hmd_ckde, hmd_gbn_val, hmd_gbn_bic, hmd_gbn_bge), \
-           (shd_ckde, shd_gbn_val, shd_gbn_bic, shd_gbn_bge),\
-           thd_ckde
+    return (slogl_true, slogl_spbn, slogl_gbn_val, slogl_gbn_bic, slogl_gbn_bge), \
+           (hmd_spbn, hmd_gbn_val, hmd_gbn_bic, hmd_gbn_bge), \
+           (shd_spbn, shd_gbn_val, shd_gbn_bic, shd_gbn_bge),\
+           thd_spbn
 
 
 def plot_likelihood(train_datasets, test_datasets, model_folders, true_models):
-    patience = [0, 5]
+    patience = experiments_helper.PATIENCE
 
     loglikelihood_info, _, _, _ = extract_info(train_datasets, test_datasets, model_folders, true_models)
-    logl_true, logl_ckde, logl_gbn_val, logl_gbn_bic, logl_gbn_bge = loglikelihood_info
+    slogl_true, slogl_spbn, slogl_gbn_val, slogl_gbn_bic, slogl_gbn_bge = loglikelihood_info
 
     N = len(train_datasets) * len(train_datasets[0])
     ind = np.arange(N)
@@ -188,25 +136,25 @@ def plot_likelihood(train_datasets, test_datasets, model_folders, true_models):
     ax = fig.add_subplot(111)
 
     for idx_p, p in enumerate(patience):
-        t = ax.plot(ind, logl_ckde[:,:, idx_p].reshape(-1))
+        t = ax.plot(ind, slogl_spbn[:,:, idx_p].reshape(-1))
         b.append(t)
 
     for idx_p, p in enumerate(patience):
-        t = ax.plot(ind, logl_gbn_val[:, :, idx_p].reshape(-1))
+        t = ax.plot(ind, slogl_gbn_val[:, :, idx_p].reshape(-1))
         b.append(t)
 
-    t = ax.plot(ind, logl_gbn_bic[:, :].reshape(-1))
+    t = ax.plot(ind, slogl_gbn_bic[:, :].reshape(-1))
     b.append(t)
 
-    t = ax.plot(ind, logl_gbn_bge[:, :].reshape(-1))
+    t = ax.plot(ind, slogl_gbn_bge[:, :].reshape(-1))
     b.append(t)
     plt.show()
 
 def plot_hmd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names):
-    patience = [0, 5]
+    patience = experiments_helper.PATIENCE
 
     _, hmd_info, _, _ = extract_info(train_datasets, test_datasets, model_folders, true_models)
-    hmd_ckde, hmd_gbn_val, hmd_gbn_bic, hmd_gbn_bge = hmd_info
+    hmd_spbn, hmd_gbn_val, hmd_gbn_bic, hmd_gbn_bge = hmd_info
 
     N = len(train_datasets) * len(train_datasets[0])
     num_bars = len(patience)*2 + 2
@@ -227,7 +175,7 @@ def plot_hmd(train_datasets, test_datasets, model_folders, true_models, dataset_
     offset = 0
 
     for idx_p, p in enumerate(patience):
-        t = ax.bar(ind+width*offset, hmd_ckde[:,:, idx_p].reshape(-1), width, color=COLOR1, linewidth=0.5,
+        t = ax.bar(ind+width*offset, hmd_spbn[:,:, idx_p].reshape(-1), width, color=COLOR1, linewidth=0.5,
                    align='edge', edgecolor="black")
         offset += 1
         if p == 5:
@@ -277,7 +225,7 @@ def plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_
     patience = [0, 5]
 
     _, _, shd_info, _ = extract_info(train_datasets, test_datasets, model_folders, true_models)
-    shd_ckde, shd_gbn_val, shd_gbn_bic, shd_gbn_bge = shd_info
+    shd_spbn, shd_gbn_val, shd_gbn_bic, shd_gbn_bge = shd_info
 
     N = len(train_datasets) * len(train_datasets[0])
     num_bars = len(patience)*2 + 2
@@ -298,7 +246,7 @@ def plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_
     offset = 0
 
     for idx_p, p in enumerate(patience):
-        t = ax.bar(ind+width*offset, shd_ckde[:,:, idx_p].reshape(-1), width, color=COLOR1, linewidth=0.5,
+        t = ax.bar(ind+width*offset, shd_spbn[:,:, idx_p].reshape(-1), width, color=COLOR1, linewidth=0.5,
                    align='edge', edgecolor="black")
         offset += 1
         if p == 5:
@@ -347,7 +295,7 @@ def plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_
 def plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names):
     patience = [5]
 
-    _, _, _, thd_ckde = extract_info(train_datasets, test_datasets, model_folders, true_models)
+    _, _, _, thd_spbn = extract_info(train_datasets, test_datasets, model_folders, true_models)
     # shd_ckde, shd_gbn_val, shd_gbn_bic, shd_gbn_bge = shd_info
 
     N = len(train_datasets) * len(train_datasets[0])
@@ -370,7 +318,7 @@ def plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_
 
     # for idx_p, p in enumerate(patience):
     # print(ind+width*offset)
-    t = ax.bar(ind+width*offset, thd_ckde[:,:,1].reshape(-1), width, color=COLOR1, linewidth=0.5,
+    t = ax.bar(ind+width*offset, thd_spbn[:,:,1].reshape(-1), width, color=COLOR1, linewidth=0.5,
                align='edge', edgecolor="black")
     offset += 1
     for bar in t:

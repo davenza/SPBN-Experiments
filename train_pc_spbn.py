@@ -7,27 +7,9 @@ from pybnesian.learning.algorithms import GreedyHillClimbing, PC
 from pybnesian.learning.algorithms.callbacks import SaveModel
 from pybnesian.learning.operators import OperatorPool, ArcOperatorSet, ChangeNodeTypeSet
 from pybnesian.learning.scores import ValidatedLikelihood
-from pybnesian.learning.scores import LinearCorrelation, KMutualInformation
+from pybnesian.learning.independences import LinearCorrelation, KMutualInformation
 from pybnesian.models import SemiparametricBN
-
-
 from sklearn.model_selection import KFold
-
-def remove_bidirected(pdag):
-    arcs = pdag.arcs()
-    bidirected_arcs = []
-    
-    for arc in arcs:
-        if arc[::-1] in arcs:
-            bidirected_arcs.append(arc)
-
-            arcs.remove(arc)
-            arcs.remove(arc[::-1])
-
-    for to_remove in bidirected_arcs:
-        pdag.remove_arc(to_remove[0], to_remove[1])
-
-    return pdag.to_dag()
 
 def run_pc_lc_spbn(train_data, folds, patience, result_folder, idx_fold):
     hc = GreedyHillClimbing()
@@ -38,7 +20,7 @@ def run_pc_lc_spbn(train_data, folds, patience, result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = remove_bidirected(pdag)
+        dag = experiments_helper.remove_bidirected(pdag)
 
     for k in folds:
         vl = ValidatedLikelihood(train_data, k=k, seed=experiments_helper.SEED)
@@ -66,7 +48,7 @@ def run_pc_kmi_spbn(train_data, folds, patience, result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = remove_bidirected(pdag)
+        dag = experiments_helper.remove_bidirected(pdag)
 
     for k in folds:
         vl = ValidatedLikelihood(train_data, k=k, seed=experiments_helper.SEED)

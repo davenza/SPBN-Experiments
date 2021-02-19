@@ -26,7 +26,7 @@ def run_pc_graph(train_data, result_folder, idx_fold):
     if not os.path.exists(fold_folder + '/end-kmi.lock'):
         kmi = KMutualInformation(train_data, k=25, seed=experiments_helper.SEED)
         
-        graph_kmi = pc.estimate(lc)
+        graph_kmi = pc.estimate(kmi)
         graph_kmi.save(fold_folder + '/graph-kmi-' + str(idx_fold))
 
         with open(fold_folder + '/end-kmi.lock', 'w') as f:

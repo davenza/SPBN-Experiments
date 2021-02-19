@@ -4,25 +4,8 @@ import pathlib
 import multiprocessing as mp
 from pybnesian import load
 from pybnesian.models import GaussianNetwork
-
-
 from sklearn.model_selection import KFold
 
-def remove_bidirected(pdag):
-    arcs = pdag.arcs()
-    bidirected_arcs = []
-    
-    for arc in arcs:
-        if arc[::-1] in arcs:
-            bidirected_arcs.append(arc)
-
-            arcs.remove(arc)
-            arcs.remove(arc[::-1])
-
-    for to_remove in bidirected_arcs:
-        pdag.remove_arc(to_remove[0], to_remove[1])
-
-    return pdag.to_dag()
 
 def run_pc_lc_gbn(train_data, folds, patience, result_folder, idx_fold):
     fold_folder = result_folder + '/PC/Gaussian/LinearCorrelation/' + str(idx_fold)
@@ -33,7 +16,7 @@ def run_pc_lc_gbn(train_data, folds, patience, result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = remove_bidirected(pdag)
+        dag = experiments_helper.remove_bidirected(pdag)
 
     gbn = GaussianNetwork(dag)
     gbn.save(fold_folder + "/000000")
@@ -47,7 +30,7 @@ def run_pc_kmi_gbn(train_data, folds, patience, result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = remove_bidirected(pdag)
+        dag = experiments_helper.remove_bidirected(pdag)
 
     gbn = GaussianNetwork(dag)
     gbn.save(fold_folder + "/000000")
