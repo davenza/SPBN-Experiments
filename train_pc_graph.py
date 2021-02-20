@@ -14,23 +14,17 @@ def run_pc_graph(train_data, result_folder, idx_fold):
     
     pc = PC()
     
-    if not os.path.exists(fold_folder + '/end-lc.lock'):
+    if not os.path.exists(fold_folder + '/graph-lc-' + str(idx_fold) + '.pickle'):
         lc = LinearCorrelation(train_data)
         
         graph_lc = pc.estimate(lc)
         graph_lc.save(fold_folder + '/graph-lc-' + str(idx_fold))
 
-        with open(fold_folder + '/end-lc.lock', 'w') as f:
-            pass
-    
-    if not os.path.exists(fold_folder + '/end-kmi.lock'):
+    if not os.path.exists(fold_folder + '/graph-kmi-' + str(idx_fold) + '.pickle'):
         kmi = KMutualInformation(train_data, k=25, seed=experiments_helper.SEED)
         
         graph_kmi = pc.estimate(kmi)
         graph_kmi.save(fold_folder + '/graph-kmi-' + str(idx_fold))
-
-        with open(fold_folder + '/end-kmi.lock', 'w') as f:
-            pass
 
 def train_crossvalidation_file(file, folds):
     x = experiments_helper.validate_dataset(file, folds)
