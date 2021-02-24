@@ -3,7 +3,7 @@ import experiments_helper
 import pathlib
 import multiprocessing as mp
 from pybnesian.learning.algorithms import PC
-from pybnesian.learning.independences import LinearCorrelation, KMutualInformation
+from pybnesian.learning.independences import LinearCorrelation, RCoT
 
 from sklearn.model_selection import KFold
 
@@ -20,11 +20,11 @@ def run_pc_graph(train_data, result_folder, idx_fold):
         graph_lc = pc.estimate(lc)
         graph_lc.save(fold_folder + '/graph-lc-' + str(idx_fold))
 
-    if not os.path.exists(fold_folder + '/graph-kmi-' + str(idx_fold) + '.pickle'):
-        kmi = KMutualInformation(train_data, k=25, seed=experiments_helper.SEED)
+    if not os.path.exists(fold_folder + '/graph-rcot-' + str(idx_fold) + '.pickle'):
+        rcot = RCoT(train_data)
         
-        graph_kmi = pc.estimate(kmi)
-        graph_kmi.save(fold_folder + '/graph-kmi-' + str(idx_fold))
+        graph_rcot = pc.estimate(rcot)
+        graph_rcot.save(fold_folder + '/graph-rcot-' + str(idx_fold))
 
 def train_crossvalidation_file(file, folds):
     x = experiments_helper.validate_dataset(file, folds)

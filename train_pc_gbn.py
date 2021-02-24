@@ -21,11 +21,11 @@ def run_pc_lc_gbn(train_data, folds, patience, result_folder, idx_fold):
     gbn = GaussianNetwork(dag)
     gbn.save(fold_folder + "/000000")
 
-def run_pc_kmi_gbn(train_data, folds, patience, result_folder, idx_fold):
-    fold_folder = result_folder + '/PC/Gaussian/KMutualInformation/' + str(idx_fold)
+def run_pc_rcot_gbn(train_data, folds, patience, result_folder, idx_fold):
+    fold_folder = result_folder + '/PC/Gaussian/RCoT/' + str(idx_fold)
     pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
-    pdag = load(result_folder + '/PC/graph-kmi-'+ str(idx_fold) + ".pickle")
+    pdag = load(result_folder + '/PC/graph-rcot-'+ str(idx_fold) + ".pickle")
 
     try:
         dag = pdag.to_dag()
@@ -38,7 +38,7 @@ def run_pc_kmi_gbn(train_data, folds, patience, result_folder, idx_fold):
 
 def run_pc_gbn(train_data, folds, patience, result_folder, idx_fold):
     run_pc_lc_gbn(train_data, folds, patience, result_folder, idx_fold)
-    run_pc_kmi_gbn(train_data, folds, patience, result_folder, idx_fold)
+    run_pc_rcot_gbn(train_data, folds, patience, result_folder, idx_fold)
 
 def train_crossvalidation_file(file, folds):
     x = experiments_helper.validate_dataset(file, folds)

@@ -47,9 +47,9 @@ for df, model_folder in [(df_200, 'models/200'), (df_2000, 'models/2000'), (df_1
         dag_lc = experiments_helper.remove_bidirected(pdag_lc)
     find_node_types(df, dag_lc, model_folder, 'LinearCorrelation', patience)
 
-    pdag_kmi = load(model_folder + '/PC/graph-kmi.pickle')
+    pdag_rcot = load(model_folder + '/PC/graph-rcot.pickle')
     try:
-        dag_kmi = pdag_kmi.to_dag()
+        dag_rcot = pdag_rcot.to_dag()
     except ValueError:
-        dag_kmi = experiments_helper.remove_bidirected(pdag_kmi)
-    find_node_types(df, dag_kmi, model_folder, 'KMutualInformation', patience)
+        dag_rcot = experiments_helper.remove_bidirected(pdag_rcot)
+    find_node_types(df, dag_rcot, model_folder, 'RCoT', patience)

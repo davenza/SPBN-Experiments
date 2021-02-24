@@ -39,17 +39,17 @@ for d in experiments_helper.DATASETS:
                     pass
 
 
-        pdag_kmi = load('models/' + d + '/' + str(i) + '/PC/graph-kmi.pickle')
+        pdag_rcot = load('models/' + d + '/' + str(i) + '/PC/graph-rcot.pickle')
 
         try:
-            dag_kmi = pdag_kmi.to_dag()
+            dag_rcot = pdag_rcot.to_dag()
         except ValueError:
-            dag_kmi = experiments_helper.remove_bidirected(pdag_kmi)
+            dag_rcot = experiments_helper.remove_bidirected(pdag_rcot)
 
         vl = ValidatedLikelihood(df, k=10, seed=experiments_helper.SEED)
 
         for p in experiments_helper.PATIENCE:
-            result_folder = 'models/' + d + '/' + str(i) + '/PC/SPBN/KMutualInformation/' + str(p)
+            result_folder = 'models/' + d + '/' + str(i) + '/PC/SPBN/RCoT/' + str(p)
             pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
 
             if not os.path.exists(result_folder + '/end.lock'):

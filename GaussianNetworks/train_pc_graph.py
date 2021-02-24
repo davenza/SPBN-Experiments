@@ -1,6 +1,6 @@
 import pandas as pd
 from pybnesian.learning.algorithms import PC
-from pybnesian.learning.independences import LinearCorrelation, KMutualInformation
+from pybnesian.learning.independences import LinearCorrelation, RCoT
 import pathlib
 import os
 import experiments_helper
@@ -22,11 +22,11 @@ for d in experiments_helper.DATASETS:
             with open(result_folder + '/end-lc.lock', 'w') as f:
                 pass
     
-        if not os.path.exists(result_folder + '/end-kmi.lock'):
-            kmi = KMutualInformation(df, k=25, seed=experiments_helper.SEED)
+        if not os.path.exists(result_folder + '/end-rcot.lock'):
+            rcot = RCoT(df)
             
-            graph_kmi = pc.estimate(kmi)
-            graph_kmi.save(result_folder + '/graph-kmi')
+            graph_rcot = pc.estimate(rcot)
+            graph_rcot.save(result_folder + '/graph-rcot')
 
-            with open(result_folder + '/end-kmi.lock', 'w') as f:
+            with open(result_folder + '/end-rcot.lock', 'w') as f:
                 pass

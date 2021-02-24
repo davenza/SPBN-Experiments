@@ -40,6 +40,6 @@ for df, model_folder in [(df_200, 'models/200'), (df_2000, 'models/2000'), (df_1
     print("Folder " + model_folder)
 
     test_spbn(df, model_folder, patience, 'LinearCorrelation')
-    test_spbn(df, model_folder, patience, 'KMutualInformation')
+    test_spbn(df, model_folder, patience, 'RCoT')
 
 

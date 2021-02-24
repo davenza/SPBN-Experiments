@@ -7,7 +7,7 @@ from pybnesian.learning.algorithms import GreedyHillClimbing, PC
 from pybnesian.learning.algorithms.callbacks import SaveModel
 from pybnesian.learning.operators import OperatorPool, ArcOperatorSet, ChangeNodeTypeSet
 from pybnesian.learning.scores import ValidatedLikelihood
-from pybnesian.learning.independences import LinearCorrelation, KMutualInformation
+from pybnesian.learning.independences import LinearCorrelation, RCoT
 from pybnesian.models import SemiparametricBN
 from sklearn.model_selection import KFold
 
@@ -39,11 +39,11 @@ def run_pc_lc_spbn(train_data, folds, patience, result_folder, idx_fold):
             with open(fold_folder + '/end.lock', 'w') as f:
                 pass
 
-def run_pc_kmi_spbn(train_data, folds, patience, result_folder, idx_fold):
+def run_pc_rcot_spbn(train_data, folds, patience, result_folder, idx_fold):
     hc = GreedyHillClimbing()
     change_node_type = ChangeNodeTypeSet()
 
-    pdag = load(result_folder + '/PC/graph-kmi-'+ str(idx_fold) + ".pickle")
+    pdag = load(result_folder + '/PC/graph-rcot-'+ str(idx_fold) + ".pickle")
 
     try:
         dag = pdag.to_dag()
@@ -54,7 +54,7 @@ def run_pc_kmi_spbn(train_data, folds, patience, result_folder, idx_fold):
         vl = ValidatedLikelihood(train_data, k=k, seed=experiments_helper.SEED)
 
         for p in patience:
-            fold_folder = result_folder + '/PC/SPBN/KMutualInformation/Validation_' + str(k) + '_' + str(p) + '/' + str(idx_fold)
+            fold_folder = result_folder + '/PC/SPBN/RCoT/Validation_' + str(k) + '_' + str(p) + '/' + str(idx_fold)
             pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
             if os.path.exists(fold_folder + '/end.lock'):
@@ -69,7 +69,7 @@ def run_pc_kmi_spbn(train_data, folds, patience, result_folder, idx_fold):
 
 def run_pc_spbn(train_data, folds, patience, result_folder, idx_fold):
     run_pc_lc_spbn(train_data, folds, patience, result_folder, idx_fold)
-    run_pc_kmi_spbn(train_data, folds, patience, result_folder, idx_fold)
+    run_pc_rcot_spbn(train_data, folds, patience, result_folder, idx_fold)
 
 def train_crossvalidation_file(file, folds, patience):
     x = experiments_helper.validate_dataset(file, folds)

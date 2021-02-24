@@ -13,8 +13,8 @@ def test_pc_lc_kdebn(train_data, test_data, result_folder, idx_fold):
     final_model.fit(train_data)
     return final_model.slogl(test_data)
 
-def test_pc_kmi_kdebn(train_data, test_data, result_folder, idx_fold):
-    models_folder = result_folder + '/PC/KDEBN/KMutualInformation/' + str(idx_fold)
+def test_pc_rcot_kdebn(train_data, test_data, result_folder, idx_fold):
+    models_folder = result_folder + '/PC/KDEBN/RCoT/' + str(idx_fold)
     all_models = sorted(glob.glob(models_folder + '/*.pickle'))
     final_model = load(all_models[-1])
     final_model.fit(train_data)
@@ -23,7 +23,7 @@ def test_pc_kmi_kdebn(train_data, test_data, result_folder, idx_fold):
 def test_crossvalidation():
     files = experiments_helper.find_crossvalidation_datasets()
 
-    string_file = "Dataset,KDEBN_PC_LC,KDEBN_PC_KMI"
+    string_file = "Dataset,KDEBN_PC_LC,KDEBN_PC_RCOT"
 
     print(string_file)
     for file in files:
@@ -34,7 +34,7 @@ def test_crossvalidation():
             dataset, result_folder = x
 
         kdebn_lc_score = np.full((experiments_helper.EVALUATION_FOLDS,), np.nan)
-        kdebn_kmi_score = np.full((experiments_helper.EVALUATION_FOLDS,), np.nan)
+        kdebn_rcot_score = np.full((experiments_helper.EVALUATION_FOLDS,), np.nan)
 
         for (idx_fold, (train_indices, test_indices)) in enumerate(KFold(experiments_helper.EVALUATION_FOLDS, shuffle=True, 
                                                                    random_state=experiments_helper.SEED).split(dataset)):
@@ -42,13 +42,13 @@ def test_crossvalidation():
             test_dataset = dataset.iloc[test_indices,:]
 
             kdebn_lc_score[idx_fold] = test_pc_lc_kdebn(train_dataset, test_dataset, result_folder, idx_fold)
-            kdebn_kmi_score[idx_fold] = test_pc_kmi_kdebn(train_dataset, test_dataset, result_folder, idx_fold)
+            kdebn_rcot_score[idx_fold] = test_pc_rcot_kdebn(train_dataset, test_dataset, result_folder, idx_fold)
 
         sum_kdebn_lc_score = kdebn_lc_score.sum(axis=0)
-        sum_kdebn_kmi_score = kdebn_kmi_score.sum(axis=0)
+        sum_kdebn_rcot_score = kdebn_rcot_score.sum(axis=0)
 
         basefolder = os.path.basename(os.path.dirname(file))
-        new_line = basefolder + "," + str(sum_kdebn_lc_score) + "," + str(sum_kdebn_pc_kmi)
+        new_line = basefolder + "," + str(sum_kdebn_lc_score) + "," + str(sum_kdebn_pc_rcot)
 
         print(new_line)
 

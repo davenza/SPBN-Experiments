@@ -2,7 +2,7 @@ import pandas as pd
 import experiments_helper
 import pathlib
 from pybnesian.learning.algorithms import PC
-from pybnesian.learning.independences import LinearCorrelation, KMutualInformation
+from pybnesian.learning.independences import LinearCorrelation, RCoT
 
 df_200 = pd.read_csv('synthetic_200.csv')
 df_2000 = pd.read_csv('synthetic_2000.csv')
@@ -24,11 +24,11 @@ for df, model_folder in [(df_200, 'models/200'), (df_2000, 'models/2000'), (df_1
         with open(result_folder + '/end-lc.lock', 'w') as f:
             pass
     
-    if not os.path.exists(result_folder + '/end-kmi.lock'):
-        kmi = KMutualInformation(train_data, k=25, seed=experiments_helper.SEED)
+    if not os.path.exists(result_folder + '/end-rcot.lock'):
+        rcot = RCoT(train_data)
         
-        graph_kmi = pc.estimate(kmi)
-        graph_kmi.save(result_folder + '/graph-kmi')
+        graph_rcot = pc.estimate(rcot)
+        graph_rcot.save(result_folder + '/graph-rcot')
 
-        with open(result_folder + '/end-kmi.lock', 'w') as f:
+        with open(result_folder + '/end-rcot.lock', 'w') as f:
             pass

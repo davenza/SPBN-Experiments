@@ -22,11 +22,11 @@ def run_pc_lc_kdebn(train_data, folds, patience, result_folder, idx_fold):
     kdebn = KDENetwork(dag)
     kdebn.save(fold_folder + "/000000")
 
-def run_pc_kmi_kdebn(train_data, folds, patience, result_folder, idx_fold):
-    fold_folder = result_folder + '/PC/KDEBN/KMutualInformation/' + str(idx_fold)
+def run_pc_rcot_kdebn(train_data, folds, patience, result_folder, idx_fold):
+    fold_folder = result_folder + '/PC/KDEBN/RCoT/' + str(idx_fold)
     pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
-    pdag = load(result_folder + '/PC/graph-kmi-'+ str(idx_fold) + ".pickle")
+    pdag = load(result_folder + '/PC/graph-rcot-'+ str(idx_fold) + ".pickle")
 
     try:
         dag = pdag.to_dag()
@@ -39,7 +39,7 @@ def run_pc_kmi_kdebn(train_data, folds, patience, result_folder, idx_fold):
 
 def run_pc_kdebn(train_data, folds, patience, result_folder, idx_fold):
     run_pc_lc_kdebn(train_data, folds, patience, result_folder, idx_fold)
-    run_pc_kmi_kdebn(train_data, folds, patience, result_folder, idx_fold)
+    run_pc_rcot_kdebn(train_data, folds, patience, result_folder, idx_fold)
 
 def train_crossvalidation_file(file, folds):
     x = experiments_helper.validate_dataset(file, folds)
