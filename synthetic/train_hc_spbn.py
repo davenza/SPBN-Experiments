@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import experiments_helper
 import pathlib
@@ -18,7 +19,7 @@ pool = OperatorPool([ArcOperatorSet(), ChangeNodeTypeSet()])
 
 for df, model_folder in [(df_200, 'models/200'), (df_2000, 'models/2000'), (df_10000, 'models/10000')]:
     
-    vl = ValidatedLikelihood(train_data, k=10, seed=0)
+    vl = ValidatedLikelihood(df, k=10, seed=0)
     for p in patience:
         result_folder = model_folder + '/HillClimbing/' + str(p)
         pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
