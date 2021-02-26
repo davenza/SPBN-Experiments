@@ -7,7 +7,7 @@ from pybnesian.models import GaussianNetwork
 from sklearn.model_selection import KFold
 
 
-def run_pc_lc_gbn(train_data, folds, patience, result_folder, idx_fold):
+def run_pc_lc_gbn(result_folder, idx_fold):
     fold_folder = result_folder + '/PC/Gaussian/LinearCorrelation/' + str(idx_fold)
     pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
@@ -21,7 +21,7 @@ def run_pc_lc_gbn(train_data, folds, patience, result_folder, idx_fold):
     gbn = GaussianNetwork(dag)
     gbn.save(fold_folder + "/000000")
 
-def run_pc_rcot_gbn(train_data, folds, patience, result_folder, idx_fold):
+def run_pc_rcot_gbn(result_folder, idx_fold):
     fold_folder = result_folder + '/PC/Gaussian/RCoT/' + str(idx_fold)
     pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
@@ -36,9 +36,9 @@ def run_pc_rcot_gbn(train_data, folds, patience, result_folder, idx_fold):
     gbn.save(fold_folder + "/000000")
 
 
-def run_pc_gbn(train_data, folds, patience, result_folder, idx_fold):
-    run_pc_lc_gbn(train_data, folds, patience, result_folder, idx_fold)
-    run_pc_rcot_gbn(train_data, folds, patience, result_folder, idx_fold)
+def run_pc_gbn(result_folder, idx_fold):
+    run_pc_lc_gbn(result_folder, idx_fold)
+    run_pc_rcot_gbn(result_folder, idx_fold)
 
 def train_crossvalidation_file(file, folds):
     x = experiments_helper.validate_dataset(file, folds)
@@ -51,10 +51,10 @@ def train_crossvalidation_file(file, folds):
         os.mkdir(result_folder)
 
     with mp.Pool(processes=experiments_helper.EVALUATION_FOLDS) as p:
-        p.starmap(run_pc_gbn, [(dataset.iloc[train_indices,:], folds, result_folder, idx_fold)
-                                             for (idx_fold, (train_indices, test_indices)) in
-                                             enumerate(KFold(experiments_helper.EVALUATION_FOLDS, shuffle=True, 
-                                                             random_state=experiments_helper.SEED).split(dataset))]
+        p.starmap(run_pc_gbn, [(result_folder, idx_fold)
+                                for (idx_fold, (train_indices, test_indices)) in
+                                enumerate(KFold(experiments_helper.EVALUATION_FOLDS, shuffle=True, 
+                                                random_state=experiments_helper.SEED).split(dataset))]
                   )
 
 def train_crossvalidation():
