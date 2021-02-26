@@ -29,12 +29,12 @@ def test_bic_gaussian(train_data, test_data, result_folder, idx_fold):
     return final_model.slogl(test_data)
 
 def test_bge_gaussian(train_data, test_data, result_folder, idx_fold):
-    models_folder = result_folder + 'HillClimbing/Gaussian/BGe/' + str(idx_fold)
+    models_folder = result_folder + '/HillClimbing/Gaussian/BGe/' + str(idx_fold)
     all_models = sorted(glob.glob(models_folder + '/*.pickle'))
     final_model = load(all_models[-1])
     final_model.fit(train_data)
 
-    return final_model.logpdf_dataset(test_data).sum()
+    return final_model.slogl(test_data)
 
 def test_crossvalidation():
     files = experiments_helper.find_crossvalidation_datasets()

@@ -48,7 +48,7 @@ def test_crossvalidation():
         sum_gbn_rcot_score = gbn_rcot_score.sum(axis=0)
 
         basefolder = os.path.basename(os.path.dirname(file))
-        new_line = basefolder + "," + str(sum_gbn_lc_score) + "," + str(sum_gbn_pc_rcot)
+        new_line = basefolder + "," + str(sum_gbn_lc_score) + "," + str(sum_gbn_rcot_score)
 
         print(new_line)
 

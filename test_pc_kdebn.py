@@ -48,7 +48,7 @@ def test_crossvalidation():
         sum_kdebn_rcot_score = kdebn_rcot_score.sum(axis=0)
 
         basefolder = os.path.basename(os.path.dirname(file))
-        new_line = basefolder + "," + str(sum_kdebn_lc_score) + "," + str(sum_kdebn_pc_rcot)
+        new_line = basefolder + "," + str(sum_kdebn_lc_score) + "," + str(sum_kdebn_rcot_score)
 
         print(new_line)
 
