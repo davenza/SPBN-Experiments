@@ -20,7 +20,7 @@ def run_pc_lc_spbn(train_data, folds, patience, result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = experiments_helper.remove_bidirected(pdag)
+        dag = pdag.to_approximate_dag()
 
     for k in folds:
         vl = ValidatedLikelihood(train_data, k=k, seed=experiments_helper.SEED)
@@ -48,7 +48,7 @@ def run_pc_rcot_spbn(train_data, folds, patience, result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = experiments_helper.remove_bidirected(pdag)
+        dag = pdag.to_approximate_dag()
 
     for k in folds:
         vl = ValidatedLikelihood(train_data, k=k, seed=experiments_helper.SEED)

@@ -79,19 +79,3 @@ def validate_dataset(file, folds):
     dataset = dataset.drop(dependent_features, axis=1)
 
     return dataset, result_folder
-
-def remove_bidirected(pdag):
-    arcs = pdag.arcs()
-    bidirected_arcs = []
-    
-    for arc in arcs:
-        if arc[::-1] in arcs:
-            bidirected_arcs.append(arc)
-
-            arcs.remove(arc)
-            arcs.remove(arc[::-1])
-
-    for to_remove in bidirected_arcs:
-        pdag.remove_arc(to_remove[0], to_remove[1])
-
-    return pdag.to_dag()

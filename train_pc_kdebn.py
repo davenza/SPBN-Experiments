@@ -2,7 +2,7 @@ import os
 import experiments_helper
 import pathlib
 import multiprocessing as mp
-from pybnesian.graph import load
+from pybnesian import load
 from pybnesian.models import KDENetwork
 
 from sklearn.model_selection import KFold
@@ -17,7 +17,7 @@ def run_pc_lc_kdebn(result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = experiments_helper.remove_bidirected(pdag)
+        dag = pdag.to_approximate_dag()
 
     kdebn = KDENetwork(dag)
     kdebn.save(fold_folder + "/000000")
@@ -31,7 +31,7 @@ def run_pc_rcot_kdebn(result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = experiments_helper.remove_bidirected(pdag)
+        dag = pdag.to_approximate_dag()
 
     kdebn = KDENetwork(dag)
     kdebn.save(fold_folder + "/000000")

@@ -16,7 +16,7 @@ def run_pc_lc_gbn(result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = experiments_helper.remove_bidirected(pdag)
+        dag = pdag.to_approximate_dag()
 
     gbn = GaussianNetwork(dag)
     gbn.save(fold_folder + "/000000")
@@ -30,7 +30,7 @@ def run_pc_rcot_gbn(result_folder, idx_fold):
     try:
         dag = pdag.to_dag()
     except ValueError:
-        dag = experiments_helper.remove_bidirected(pdag)
+        dag = pdag.to_approximate_dag()
 
     gbn = GaussianNetwork(dag)
     gbn.save(fold_folder + "/000000")
