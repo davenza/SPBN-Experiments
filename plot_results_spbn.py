@@ -9,11 +9,12 @@ import glob
 import os
 import experiments_helper
 
-from pgmpy.models import HybridContinuousModel
-from pgmpy.factors.continuous import NodeType
+from pybnesian import load
+from pybnesian.factors import NodeType
 
 import tikzplotlib
 import adjusted_pvalues
+import experiments_helper
 
 def print_apv(avgranks, names, type="bergmann"):
 
@@ -28,47 +29,41 @@ def print_apv(avgranks, names, type="bergmann"):
 
 
 def plot_cd_diagrams(rename_dict):
-    df_bn = pd.read_csv('cv_results_bn.csv')
-    df_gmm = pd.read_csv('cv_results_gmm.csv')
-    df_kde = pd.read_csv('cv_results_kde.csv')
-    df_kdebn = pd.read_csv('cv_results_kdenetwork.csv')
-    df_spbn_strict = pd.read_csv('cv_results_spbn_strict.csv')
+    df_hc_gbn = pd.read_csv('results_hc_gbn.csv')
+    df_hc_kdebn = pd.read_csv('results_hc_kdebn.csv')
+    df_hc_spbn = pd.read_csv('results_hc_spbn.csv')
 
-    # df_bn = df_bn.loc[:, ['Dataset', 'CKDE_Validation_10_0', 'CKDE_Validation_10_5', 'Gaussian_Validation_10_0',
-    #                       'Gaussian_Validation_10_5', 'BIC', 'BGe']]
-    # df_bn = df_bn.loc[:, ['Dataset', 'Gaussian_Validation_10_0', 'Gaussian_Validation_10_5', 'BIC', 'BGe']]
-    df_bn = df_bn.loc[:, ['Dataset', 'CKDE_Validation_10_0', 'CKDE_Validation_10_5', 'BIC', 'BGe',
-                          'Gaussian_Validation_10_0', 'Gaussian_Validation_10_5']]
+    df_pc_gbn = pd.read_csv('results_pc_gbn.csv')
+    df_pc_kdebn = pd.read_csv('results_pc_kdebn.csv')
+    df_pc_spbn = pd.read_csv('results_pc_spbn.csv')
 
+    df_hc_gbn = df_hc_gbn.set_index('Dataset')
+    df_hc_kdebn = df_hc_kdebn.set_index('Dataset')
+    df_hc_spbn = df_hc_spbn.set_index('Dataset')
 
-    df_bn = df_bn.set_index('Dataset')
-    df_gmm = df_gmm.set_index('Dataset')
-    df_kde = df_kde.set_index('Dataset')
-    df_kdebn = df_kdebn.set_index('Dataset')
-    df_spbn_strict = df_spbn_strict.set_index('Dataset')
+    df_pc_gbn = df_pc_gbn.set_index('Dataset')
+    df_pc_kdebn = df_pc_kdebn.set_index('Dataset')
+    df_pc_spbn = df_pc_spbn.set_index('Dataset')
 
-    # df_concat = pd.concat([df_bn, df_gmm], axis=1)
-    df_algorithms = pd.DataFrame(index=df_bn.index)
+    df_algorithms = pd.DataFrame(index=df_hc_gbn.index)
 
-    # df_algorithms['CKDE_Validation_10_0'] = df_bn['CKDE_Validation_10_0']
-    # df_algorithms['CKDE_Validation_10_5'] = df_bn['CKDE_Validation_10_5']
-    df_algorithms['BIC'] = df_bn['BIC']
-    df_algorithms['BGe'] = df_bn['BGe']
-    df_algorithms['Gaussian_Validation_10_0'] = df_bn['Gaussian_Validation_10_0']
-    df_algorithms['Gaussian_Validation_10_5'] = df_bn['Gaussian_Validation_10_5']
-    # df_algorithms['GMM'] = df_gmm.max(1)
-    # df_algorithms['KDE'] = df_kde.loc[:, 'KDE']
-    df_algorithms['KDEBN_0'] = df_kdebn.loc[:, 'KDEBN_Validation_10_0']
-    df_algorithms['KDEBN_5'] = df_kdebn.loc[:, 'KDEBN_Validation_10_5']
-    df_algorithms['SPBN_STRICT_10_0'] = df_spbn_strict.loc[:, 'SPBN_STRICT_10_0']
-    df_algorithms['SPBN_STRICT_10_5'] = df_spbn_strict.loc[:, 'SPBN_STRICT_10_5']
+    # df_algorithms['SPBN_Validation_10_0'] = df_hc_spbn['SPBN_Validation_10_0']
+    df_algorithms['SPBN_Validation_10_5'] = df_hc_spbn['SPBN_Validation_10_5']
+    # df_algorithms['KDEBN_0'] = df_hc_kdebn.loc[:, 'KDEBN_Validation_10_0']
+    df_algorithms['KDEBN_5'] = df_hc_kdebn.loc[:, 'KDEBN_Validation_10_5']
+    # df_algorithms['GBN_Validation_10_0'] = df_hc_gbn['GBN_Validation_10_0']
+    df_algorithms['GBN_Validation_10_5'] = df_hc_gbn['GBN_Validation_10_5']
+    df_algorithms['BIC'] = df_hc_gbn['BIC']
+    df_algorithms['BGe'] = df_hc_gbn['BGe']
 
-    df_algorithms = df_algorithms.drop("Haberman", errors='ignore')
-    df_algorithms = df_algorithms.drop("Thyroid", errors='ignore')
-    df_algorithms = df_algorithms.drop("Transfusion", errors='ignore')
-
-    # print(df_algorithms[['SPBN_STRICT_10_5', 'SPBN_STRICT_10_0', 'KDEBN_5', 'KDEBN_0']])
-    # print(df_algorithms[['SPBN_STRICT_10_5', 'SPBN_STRICT_10_0', 'KDEBN_5', 'KDEBN_0']].rank(axis=1, ascending=False))
+    # df_algorithms['SPBN_PC_LC_10_0'] = df_pc_spbn['SPBN_PC_LC_10_0']
+    df_algorithms['SPBN_PC_LC_10_5'] = df_pc_spbn['SPBN_PC_LC_10_5']
+    # df_algorithms['SPBN_PC_RCOT_10_0'] = df_pc_spbn['SPBN_PC_RCOT_10_0']
+    df_algorithms['SPBN_PC_RCOT_10_5'] = df_pc_spbn['SPBN_PC_RCOT_10_5']
+    df_algorithms['KDEBN_PC_LC'] = df_pc_kdebn.loc[:, 'KDEBN_PC_LC']
+    df_algorithms['KDEBN_PC_RCOT'] = df_pc_kdebn.loc[:, 'KDEBN_PC_RCOT']
+    # df_algorithms['GBN_PC_LC'] = df_pc_gbn['GBN_PC_LC']
+    # df_algorithms['GBN_PC_RCOT'] = df_pc_gbn['GBN_PC_RCOT']
 
     rank = df_algorithms.rank(axis=1, ascending=False)
     avgranks = rank.mean().to_numpy()
@@ -101,17 +96,17 @@ def plot_cd_diagrams(rename_dict):
     return df_algorithms
 
 def kdeness_ckde():
-    folds = [10]
-    patience = [0, 5]
+    folds = experiments_helper.TRAINING_FOLDS
+    patience = experiments_helper.PATIENCE
 
     files = experiments_helper.find_crossvalidation_datasets()
-    valid_files = [f for f in files if experiments_helper.validate_dataset(f, [2, 3, 5, 10]) is not None]
+    valid_files = [f for f in files if experiments_helper.validate_dataset(f, folds) is not None]
 
     n_ckde = np.full((len(valid_files), len(folds), len(patience), 10), np.nan)
     datasets = []
     n_vars = []
     for idx_file, file in enumerate(valid_files):
-        x = experiments_helper.validate_dataset(file, [2, 3, 5, 10])
+        x = experiments_helper.validate_dataset(file, experiments_helper.TRAINING_FOLDS)
         dataset, result_folder = x
 
         basefolder = os.path.basename(os.path.dirname(file))
@@ -121,13 +116,12 @@ def kdeness_ckde():
         for idx_f, f in enumerate(folds):
             for idx_p, p in enumerate(patience):
                 for idx_fold in range(10):
-                    models_folder = result_folder + '/SPBN_Strict/Validation_' + str(f) + "_" + str(p) + '/' + str(idx_fold)
-                    all_models = sorted(glob.glob(models_folder + '/*.pkl'))
-                    final_model = HybridContinuousModel.load_model(all_models[-1])
+                    models_folder = result_folder + '/HillClimbing/SPBN/Validation_' + str(f) + "_" + str(p) + '/' + str(idx_fold)
+                    all_models = sorted(glob.glob(models_folder + '/*.pickle'))
+                    final_model = load(all_models[-1])
 
                     n_ckde[idx_file, idx_f, idx_p, idx_fold] = \
-                        sum(map(lambda kv: kv[1] == NodeType.SPBN_STRICT, final_model.node_type.items()))
-                        # sum(map(lambda kv: kv[1] == NodeType.CKDE, final_model.node_type.items()))
+                        sum(map(lambda kv: kv[1] == NodeType.CKDE, final_model.node_types().items()))
 
     mean_ckde = np.mean(n_ckde, axis=3).reshape(len(valid_files), -1)
     names = ["CKDE_" + str(f) + "_" + str(p) for f in folds for p in patience]
@@ -181,17 +175,23 @@ def datasets_table():
 
 if __name__ == '__main__':
     rename_dict = {
-        'CKDE_Validation_10_0': r'CKDE $\lambda = 0$',
-        'CKDE_Validation_10_5': r'CKDE $\lambda = 5$',
-        'Gaussian_Validation_10_0': r'GBN $\lambda = 0$',
-        'Gaussian_Validation_10_5': r'GBN $\lambda = 5$',
-        'BIC': r'GBN BIC',
-        'BGe': r'GBN BGe',
+        'SPBN_Validation_10_0': r'CKDE $\lambda = 0$',
+        'SPBN_Validation_10_5': r'CKDE $\lambda = 5$',
         'KDEBN_0': r'KDEBN $\lambda = 0$',
         'KDEBN_5': r'KDEBN $\lambda = 5$',
-        'SPBN_STRICT_10_0': r'SPBN $\lambda = 0$',
-        'SPBN_STRICT_10_5': r'SPBN $\lambda = 5$',
+        'GBN_Validation_10_0': r'GBN $\lambda = 0$',
+        'GBN_Validation_10_5': r'GBN $\lambda = 5$',
+        'BIC': r'GBN BIC',
+        'BGe': r'GBN BGe',
+        'SPBN_PC_LC_10_0': r'SPBN PC LC $\lambda = 0$',
+        'SPBN_PC_LC_10_5': r'SPBN PC LC $\lambda = 5$',
+        'SPBN_PC_RCOT_10_0': r'SPBN PC RCOT $\lambda = 0$',
+        'SPBN_PC_RCOT_10_5': r'SPBN PC RCOT $\lambda = 5$',
+        'KDEBN_PC_LC': r'KDEBN PC LC',
+        'KDEBN_PC_RCOT': r'KDEBN PC RCOT',
+        'GBN_PC_LC': r'GBN PC LC',
+        'GBN_PC_RCOT': r'GBN PC RCOT',
     }
-    # latex = plot_cd_diagrams(rename_dict)
+    latex = plot_cd_diagrams(rename_dict)
 
-    kdeness_ckde()
+    # kdeness_ckde()

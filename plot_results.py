@@ -9,7 +9,7 @@ import glob
 import os
 import experiments_helper
 
-from pybnesian.models import load_model
+from pybnesian import load
 from pybnesian.factors import NodeType
 
 import tikzplotlib
@@ -25,28 +25,41 @@ def print_apv(avgranks, names, type="bergmann"):
         print(alg1 + " vs " + alg2  + ": " + str(pvalue))
 
 def plot_cd_diagrams(rename_dict):
-    df_spbn = pd.read_csv('results_spbn.csv')
-    df_kdebn = pd.read_csv('results_kdebn.csv')
-    df_gbn = pd.read_csv('results_gbn.csv')
+    df_hc_gbn = pd.read_csv('results_hc_gbn.csv')
+    df_hc_kdebn = pd.read_csv('results_hc_kdebn.csv')
+    df_hc_spbn = pd.read_csv('results_hc_spbn.csv')
 
-    df_spbn = df_bn.set_index('Dataset')
-    df_kdebn = df_kdebn.set_index('Dataset')
-    df_gbn = df_gbn.set_index('Dataset')
+    df_pc_gbn = pd.read_csv('results_pc_gbn.csv')
+    df_pc_kdebn = pd.read_csv('results_pc_kdebn.csv')
+    df_pc_spbn = pd.read_csv('results_pc_spbn.csv')
 
-    df_algorithms = pd.DataFrame(index=df_bn.index)
+    df_hc_gbn = df_hc_gbn.set_index('Dataset')
+    df_hc_kdebn = df_hc_kdebn.set_index('Dataset')
+    df_hc_spbn = df_hc_spbn.set_index('Dataset')
 
-    df_algorithms['SPBN_Validation_10_0'] = df_bn['SPBN_Validation_10_0']
-    df_algorithms['SPBN_Validation_10_5'] = df_bn['SPBN_Validation_10_5']
-    df_algorithms['KDEBN_0'] = df_kdebn.loc[:, 'KDEBN_Validation_10_0']
-    df_algorithms['KDEBN_5'] = df_kdebn.loc[:, 'KDEBN_Validation_10_5']
-    df_algorithms['GBN_Validation_10_0'] = df_bn['GBN_Validation_10_0']
-    df_algorithms['GBN_Validation_10_5'] = df_bn['GBN_Validation_10_5']
-    df_algorithms['BIC'] = df_bn['BIC']
-    df_algorithms['BGe'] = df_bn['BGe']
+    df_pc_gbn = df_pc_gbn.set_index('Dataset')
+    df_pc_kdebn = df_pc_kdebn.set_index('Dataset')
+    df_pc_spbn = df_pc_spbn.set_index('Dataset')
 
-    df_algorithms = df_algorithms.drop("Haberman", errors='ignore')
-    df_algorithms = df_algorithms.drop("Thyroid", errors='ignore')
-    df_algorithms = df_algorithms.drop("Transfusion", errors='ignore')
+    df_algorithms = pd.DataFrame(index=df_hc_gbn.index)
+
+    df_algorithms['SPBN_Validation_10_0'] = df_hc_spbn['SPBN_Validation_10_0']
+    df_algorithms['SPBN_Validation_10_5'] = df_hc_spbn['SPBN_Validation_10_5']
+    df_algorithms['KDEBN_0'] = df_hc_kdebn.loc[:, 'KDEBN_Validation_10_0']
+    df_algorithms['KDEBN_5'] = df_hc_kdebn.loc[:, 'KDEBN_Validation_10_5']
+    df_algorithms['GBN_Validation_10_0'] = df_hc_gbn['GBN_Validation_10_0']
+    df_algorithms['GBN_Validation_10_5'] = df_hc_gbn['GBN_Validation_10_5']
+    df_algorithms['BIC'] = df_hc_gbn['BIC']
+    df_algorithms['BGe'] = df_hc_gbn['BGe']
+
+    df_algorithms['SPBN_PC_LC_10_0'] = df_pc_spbn['SPBN_PC_LC_10_0']
+    df_algorithms['SPBN_PC_LC_10_5'] = df_pc_spbn['SPBN_PC_LC_10_5']
+    df_algorithms['SPBN_PC_RCOT_10_0'] = df_pc_spbn['SPBN_PC_RCOT_10_0']
+    df_algorithms['SPBN_PC_RCOT_10_5'] = df_pc_spbn['SPBN_PC_RCOT_10_5']
+    df_algorithms['KDEBN_PC_LC'] = df_pc_kdebn.loc[:, 'KDEBN_PC_LC']
+    df_algorithms['KDEBN_PC_RCOT'] = df_pc_kdebn.loc[:, 'KDEBN_PC_RCOT']
+    df_algorithms['GBN_PC_LC'] = df_pc_gbn['GBN_PC_LC']
+    df_algorithms['GBN_PC_RCOT'] = df_pc_gbn['GBN_PC_RCOT']
 
     rank = df_algorithms.rank(axis=1, ascending=False)
     avgranks = rank.mean().to_numpy()
@@ -164,11 +177,22 @@ if __name__ == '__main__':
         'GBN_Validation_10_0': r'GBN $\lambda = 0$',
         'GBN_Validation_10_5': r'GBN $\lambda = 5$',
         'BIC': r'GBN BIC',
-        'BGe': r'GBN BGe'
+        'BGe': r'GBN BGe',
+        'SPBN_PC_LC_10_0': r'SPBN PC LC $\lambda = 0$',
+        'SPBN_PC_LC_10_5': r'SPBN PC LC $\lambda = 5$',
+        'SPBN_PC_RCOT_10_0': r'SPBN PC RCOT $\lambda = 0$',
+        'SPBN_PC_RCOT_10_5': r'SPBN PC RCOT $\lambda = 5$',
+        'KDEBN_PC_LC': r'KDEBN PC LC',
+        'KDEBN_PC_RCOT': r'KDEBN PC RCOT',
+        'GBN_PC_LC': r'GBN_PC_LC',
+        'GBN_PC_RCOT': r'GBN_PC_RCOT',
     }
-    # latex = plot_cd_diagrams(rename_dict)
 
-    df = kdeness_ckde()
+
+    
+    latex = plot_cd_diagrams(rename_dict)
+
+    # df = kdeness_ckde()
     # print(df)
 
     # datasets_table()
