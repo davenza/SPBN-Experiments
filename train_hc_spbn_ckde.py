@@ -31,7 +31,7 @@ def run_validation_spbn(train_data, folds, patience, result_folder, idx_fold):
             start_model = SemiparametricBN(list(train_data.columns.values), node_types)
             bn = hc.estimate(pool, vl, start_model, callback=cb_save, patience=p, verbose=True)
             iters = sorted(glob.glob(fold_folder + '/*.pickle'))
-            last_file = iters[-1]
+            last_file = os.path.basename(iters[-1])
             number = int(os.path.splitext(last_file)[0])
             bn.save(fold_folder + '/' + str(number+1).zfill(6) + ".pickle")
             with open(fold_folder + '/end.lock', 'w') as f:
@@ -48,7 +48,7 @@ def train_crossvalidation_file(file, folds, patience):
         os.mkdir(result_folder)
 
     print(file)
-    
+
     with mp.Pool(processes=experiments_helper.EVALUATION_FOLDS) as p:
         p.starmap(run_validation_spbn, [(dataset.iloc[train_indices,:], folds, patience, result_folder, idx_fold)
                                              for (idx_fold, (train_indices, test_indices)) in

@@ -29,7 +29,7 @@ def run_validation_kdebn(train_data, folds, patience, result_folder, idx_fold):
             start_model = KDENetwork(list(train_data.columns.values))
             bn = hc.estimate(arc_set, vl, start_model, callback=cb_save, patience=p, verbose=True)
             iters = sorted(glob.glob(fold_folder + '/*.pickle'))
-            last_file = iters[-1]
+            last_file = os.path.basename(iters[-1])
             number = int(os.path.splitext(last_file)[0])
             bn.save(fold_folder + '/' + str(number+1).zfill(6) + ".pickle")
             with open(fold_folder + '/end.lock', 'w') as f:

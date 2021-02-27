@@ -26,9 +26,25 @@ def print_apv(avgranks, names, type="bergmann"):
     for (pvalue, (alg1, alg2)) in apv:
         print(alg1 + " vs " + alg2  + ": " + str(pvalue))
 
+def num_instances_df():
+    files = experiments_helper.find_crossvalidation_datasets()
+    names = []
+    num_instances = []
+    for file in files:
+        x = experiments_helper.validate_dataset(file, experiments_helper.TRAINING_FOLDS)
+        if x is not None:
+            dataset, result_folder = x
+
+            names.append(os.path.basename(result_folder))
+            num_instances.append(dataset.shape[0])
+
+    return pd.DataFrame({"Dataset": names, "N": num_instances})
 
 
 def plot_cd_diagrams(rename_dict):
+    df_num_instances = num_instances_df()
+    df_num_instances = df_num_instances.set_index("Dataset")
+
     df_hc_gbn = pd.read_csv('results_hc_gbn.csv')
     df_hc_kdebn = pd.read_csv('results_hc_kdebn.csv')
     df_hc_spbn = pd.read_csv('results_hc_spbn.csv')
@@ -45,26 +61,30 @@ def plot_cd_diagrams(rename_dict):
     df_pc_kdebn = df_pc_kdebn.set_index('Dataset')
     df_pc_spbn = df_pc_spbn.set_index('Dataset')
 
-    df_algorithms = pd.DataFrame(index=df_hc_gbn.index)
+    df_algorithms = pd.DataFrame(index=df_num_instances.index)
+
+    df_algorithms['N'] = df_num_instances['N']
 
     # df_algorithms['SPBN_Validation_10_0'] = df_hc_spbn['SPBN_Validation_10_0']
     df_algorithms['SPBN_Validation_10_5'] = df_hc_spbn['SPBN_Validation_10_5']
     # df_algorithms['KDEBN_0'] = df_hc_kdebn.loc[:, 'KDEBN_Validation_10_0']
     df_algorithms['KDEBN_5'] = df_hc_kdebn.loc[:, 'KDEBN_Validation_10_5']
     # df_algorithms['GBN_Validation_10_0'] = df_hc_gbn['GBN_Validation_10_0']
-    df_algorithms['GBN_Validation_10_5'] = df_hc_gbn['GBN_Validation_10_5']
-    df_algorithms['BIC'] = df_hc_gbn['BIC']
-    df_algorithms['BGe'] = df_hc_gbn['BGe']
+    # df_algorithms['GBN_Validation_10_5'] = df_hc_gbn['GBN_Validation_10_5']
+    # df_algorithms['BIC'] = df_hc_gbn['BIC']
+    # df_algorithms['BGe'] = df_hc_gbn['BGe']
 
     # df_algorithms['SPBN_PC_LC_10_0'] = df_pc_spbn['SPBN_PC_LC_10_0']
-    df_algorithms['SPBN_PC_LC_10_5'] = df_pc_spbn['SPBN_PC_LC_10_5']
+    # df_algorithms['SPBN_PC_LC_10_5'] = df_pc_spbn['SPBN_PC_LC_10_5']
     # df_algorithms['SPBN_PC_RCOT_10_0'] = df_pc_spbn['SPBN_PC_RCOT_10_0']
-    df_algorithms['SPBN_PC_RCOT_10_5'] = df_pc_spbn['SPBN_PC_RCOT_10_5']
-    df_algorithms['KDEBN_PC_LC'] = df_pc_kdebn.loc[:, 'KDEBN_PC_LC']
-    df_algorithms['KDEBN_PC_RCOT'] = df_pc_kdebn.loc[:, 'KDEBN_PC_RCOT']
+    # df_algorithms['SPBN_PC_RCOT_10_5'] = df_pc_spbn['SPBN_PC_RCOT_10_5']
+    # df_algorithms['KDEBN_PC_LC'] = df_pc_kdebn.loc[:, 'KDEBN_PC_LC']
+    # df_algorithms['KDEBN_PC_RCOT'] = df_pc_kdebn.loc[:, 'KDEBN_PC_RCOT']
     # df_algorithms['GBN_PC_LC'] = df_pc_gbn['GBN_PC_LC']
     # df_algorithms['GBN_PC_RCOT'] = df_pc_gbn['GBN_PC_RCOT']
 
+    # df_algorithms = df_algorithms[df_algorithms['N'] > 1000]
+    df_algorithms = df_algorithms.drop('N', axis=1)
     rank = df_algorithms.rank(axis=1, ascending=False)
     avgranks = rank.mean().to_numpy()
     names = rank.columns.values
