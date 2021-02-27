@@ -1,4 +1,5 @@
 import os
+import glob
 import experiments_helper
 import pathlib
 import multiprocessing as mp
@@ -35,7 +36,11 @@ def run_pc_lc_spbn(train_data, folds, patience, result_folder, idx_fold):
             cb_save = SaveModel(fold_folder)
             start_model = SemiparametricBN(dag)
 
-            bn = hc.estimate(change_node_type, vl, start_model, callback=cb_save, patience=p)
+            bn = hc.estimate(change_node_type, vl, start_model, callback=cb_save, patience=p, verbose=True)
+            iters = sorted(glob.glob(fold_folder + '/*.pickle'))
+            last_file = iters[-1]
+            number = int(os.path.splitext(last_file)[0])
+            bn.save(fold_folder + '/' + str(number+1).zfill(6) + ".pickle")
             with open(fold_folder + '/end.lock', 'w') as f:
                 pass
 
@@ -63,7 +68,15 @@ def run_pc_rcot_spbn(train_data, folds, patience, result_folder, idx_fold):
             cb_save = SaveModel(fold_folder)
             start_model = SemiparametricBN(dag)
 
-            bn = hc.estimate(change_node_type, vl, start_model, callback=cb_save, patience=p)
+            bn = hc.estimate(change_node_type, vl, start_model, callback=cb_save, patience=p, verbose=True)
+            iters = sorted(glob.glob(fold_folder + '/*.pickle'))
+            last_file = iters[-1]
+            number = int(os.path.splitext(last_file)[0])
+            bn.save(fold_folder + '/' + str(number+1).zfill(6) + ".pickle")
+            iters = sorted(glob.glob(fold_folder + '/*.pickle'))
+            last_file = iters[-1]
+            number = int(os.path.splitext(last_file)[0])
+            bn.save(fold_folder + '/' + str(number+1).zfill(6) + ".pickle")
             with open(fold_folder + '/end.lock', 'w') as f:
                 pass
 
@@ -80,6 +93,8 @@ def train_crossvalidation_file(file, folds, patience):
 
     if not os.path.exists(result_folder):
         os.mkdir(result_folder)
+
+    print(file)
 
     with mp.Pool(processes=experiments_helper.EVALUATION_FOLDS) as p:
         p.starmap(run_pc_spbn, [(dataset.iloc[train_indices,:], folds, patience, result_folder, idx_fold)

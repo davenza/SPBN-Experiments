@@ -3,6 +3,7 @@ import glob
 import experiments_helper
 import pathlib
 import multiprocessing as mp
+from pybnesian.factors import NodeType
 from pybnesian.learning.algorithms import GreedyHillClimbing
 from pybnesian.learning.algorithms.callbacks import SaveModel
 from pybnesian.learning.operators import OperatorPool, ArcOperatorSet, ChangeNodeTypeSet
@@ -19,14 +20,15 @@ def run_validation_spbn(train_data, folds, patience, result_folder, idx_fold):
         vl = ValidatedLikelihood(train_data, k=k, seed=0)
 
         for p in patience:
-            fold_folder = result_folder + '/HillClimbing/SPBN/Validation_' + str(k) + '_' + str(p) + '/' + str(idx_fold)
+            fold_folder = result_folder + '/HillClimbing/SPBN_CKDE/Validation_' + str(k) + '_' + str(p) + '/' + str(idx_fold)
             pathlib.Path(fold_folder).mkdir(parents=True, exist_ok=True)
 
             if os.path.exists(fold_folder + '/end.lock'):
                 continue
 
             cb_save = SaveModel(fold_folder)
-            start_model = SemiparametricBN(list(train_data.columns.values))
+            node_types = [(name, NodeType.CKDE) for name in train_data.columns.values]
+            start_model = SemiparametricBN(list(train_data.columns.values), node_types)
             bn = hc.estimate(pool, vl, start_model, callback=cb_save, patience=p, verbose=True)
             iters = sorted(glob.glob(fold_folder + '/*.pickle'))
             last_file = iters[-1]
@@ -46,7 +48,7 @@ def train_crossvalidation_file(file, folds, patience):
         os.mkdir(result_folder)
 
     print(file)
-
+    
     with mp.Pool(processes=experiments_helper.EVALUATION_FOLDS) as p:
         p.starmap(run_validation_spbn, [(dataset.iloc[train_indices,:], folds, patience, result_folder, idx_fold)
                                              for (idx_fold, (train_indices, test_indices)) in

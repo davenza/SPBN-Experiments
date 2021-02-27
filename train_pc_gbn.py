@@ -50,6 +50,8 @@ def train_crossvalidation_file(file, folds):
     if not os.path.exists(result_folder):
         os.mkdir(result_folder)
 
+    print(file)
+
     with mp.Pool(processes=experiments_helper.EVALUATION_FOLDS) as p:
         p.starmap(run_pc_gbn, [(result_folder, idx_fold)
                                 for (idx_fold, (train_indices, test_indices)) in

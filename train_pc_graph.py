@@ -17,13 +17,13 @@ def run_pc_graph(train_data, result_folder, idx_fold):
     if not os.path.exists(fold_folder + '/graph-lc-' + str(idx_fold) + '.pickle'):
         lc = LinearCorrelation(train_data)
         
-        graph_lc = pc.estimate(lc)
+        graph_lc = pc.estimate(lc, verbose=True)
         graph_lc.save(fold_folder + '/graph-lc-' + str(idx_fold))
 
     if not os.path.exists(fold_folder + '/graph-rcot-' + str(idx_fold) + '.pickle'):
         rcot = RCoT(train_data)
         
-        graph_rcot = pc.estimate(rcot)
+        graph_rcot = pc.estimate(rcot, verbose=True)
         graph_rcot.save(fold_folder + '/graph-rcot-' + str(idx_fold))
 
 def train_crossvalidation_file(file, folds):
@@ -35,6 +35,8 @@ def train_crossvalidation_file(file, folds):
 
     if not os.path.exists(result_folder):
         os.mkdir(result_folder)
+
+    print(file)
 
     with mp.Pool(processes=experiments_helper.EVALUATION_FOLDS) as p:
         p.starmap(run_pc_graph, [(dataset.iloc[train_indices,:], result_folder, idx_fold)
