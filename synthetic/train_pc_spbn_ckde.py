@@ -40,9 +40,6 @@ def find_node_types(df, dag, model_folder, type_of_dag_string, patience):
             pass
 
 
-
-true_model = load('true_model.pickle')
-
 df_200 = pd.read_csv('synthetic_200.csv')
 df_2000 = pd.read_csv('synthetic_2000.csv')
 df_10000 = pd.read_csv('synthetic_10000.csv')

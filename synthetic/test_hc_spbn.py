@@ -5,6 +5,7 @@ import pathlib
 import glob
 from pybnesian import load
 import experiments_helper
+from generate_dataset_spbn import slogl_model
 
 true_model = load('true_model.pickle')
 
@@ -13,7 +14,7 @@ df_2000 = pd.read_csv('synthetic_2000.csv')
 df_10000 = pd.read_csv('synthetic_10000.csv')
 df_test = pd.read_csv('synthetic_test.csv')
 
-print("True model logl: " + str(true_model.slogl(df_test)))
+print("True model logl: " + str(slogl_model(df_test)))
 
 patience = experiments_helper.PATIENCE
 
