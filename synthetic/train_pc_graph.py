@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import experiments_helper
 import pathlib
@@ -14,6 +15,8 @@ pc = PC()
 
 for df, model_folder in [(df_200, 'models/200'), (df_2000, 'models/2000'), (df_10000, 'models/10000')]:
     result_folder = model_folder + '/PC'
+    pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
+
 
     if not os.path.exists(result_folder + '/end-lc.lock'):
         lc = LinearCorrelation(df)
@@ -25,7 +28,7 @@ for df, model_folder in [(df_200, 'models/200'), (df_2000, 'models/2000'), (df_1
             pass
     
     if not os.path.exists(result_folder + '/end-rcot.lock'):
-        rcot = RCoT(train_data)
+        rcot = RCoT(df)
         
         graph_rcot = pc.estimate(rcot)
         graph_rcot.save(result_folder + '/graph-rcot')
