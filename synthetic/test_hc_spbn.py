@@ -20,7 +20,7 @@ patience = experiments_helper.PATIENCE
 for df, model_folder in [(df_200, 'models/200'), (df_2000, 'models/2000'), (df_10000, 'models/10000')]:
     print("Folder " + model_folder)
     for p in patience:
-        result_folder = model_folder + '/HillClimbing/' + str(p)
+        result_folder = model_folder + '/HillClimbing/SPBN/' + str(p)
         pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
 
         all_models = sorted(glob.glob(result_folder + '/*.pickle'))

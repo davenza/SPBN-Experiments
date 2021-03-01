@@ -20,7 +20,7 @@ patience = experiments_helper.PATIENCE
 def test_spbn(df, model_folder, patience, dag_type):
     print("Dag Type " + dag_type)
     for p in patience:
-        result_folder = model_folder + '/PC/SPBN/' + dag_type + '/' + str(p)
+        result_folder = model_folder + '/PC/SPBN_CKDE/' + dag_type + '/' + str(p)
         pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
 
         all_models = sorted(glob.glob(result_folder + '/*.pickle'))

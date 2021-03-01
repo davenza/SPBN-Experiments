@@ -5,6 +5,7 @@ import pandas as pd
 import pathlib
 import glob
 from pybnesian import load
+from pybnesian.factors import NodeType
 from pybnesian.learning.algorithms import GreedyHillClimbing
 from pybnesian.learning.algorithms.callbacks import SaveModel
 from pybnesian.learning.operators import ChangeNodeTypeSet
@@ -19,14 +20,15 @@ def find_node_types(df, dag, model_folder, type_of_dag_string, patience):
     change_node_type = ChangeNodeTypeSet()
     
     for p in patience:
-        result_folder = model_folder + '/PC/SPBN/' + type_of_dag_string + '/' + str(p)
+        result_folder = model_folder + '/PC/SPBN_CKDE/' + type_of_dag_string + '/' + str(p)
         pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
 
         if os.path.exists(result_folder + '/end.lock'):
             continue
 
         cb_save = SaveModel(result_folder)
-        start_model = SemiparametricBN(dag)
+        node_types = [(name, NodeType.CKDE) for name in df.columns.values]
+        start_model = SemiparametricBN(dag, node_types)
         bn = hc.estimate(change_node_type, vl, start_model, callback=cb_save, patience=p)
         
         iters = sorted(glob.glob(result_folder + '/*.pickle'))

@@ -17,10 +17,10 @@ print("True model logl: " + str(true_model.slogl(df_test)))
 
 patience = experiments_helper.PATIENCE
 
-def test_spbn(df, model_folder, patience, dag_type):
-    print("Dag Type " + dag_type)
+for df, model_folder in [(df_200, 'models/200'), (df_2000, 'models/2000'), (df_10000, 'models/10000')]:
+    print("Folder " + model_folder)
     for p in patience:
-        result_folder = model_folder + '/PC/SPBN/' + dag_type + '/' + str(p)
+        result_folder = model_folder + '/HillClimbing/SPBN_CKDE/' + str(p)
         pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
 
         all_models = sorted(glob.glob(result_folder + '/*.pickle'))
@@ -36,10 +36,5 @@ def test_spbn(df, model_folder, patience, dag_type):
 
         print()
 
-for df, model_folder in [(df_200, 'models/200'), (df_2000, 'models/2000'), (df_10000, 'models/10000')]:
-    print("Folder " + model_folder)
-
-    test_spbn(df, model_folder, patience, 'LinearCorrelation')
-    test_spbn(df, model_folder, patience, 'RCoT')
 
 
