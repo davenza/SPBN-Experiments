@@ -25,7 +25,7 @@ for d in experiments_helper.DATASETS:
         if not os.path.exists(result_folder + '/end-rcot.lock'):
             rcot = RCoT(df)
             
-            graph_rcot = pc.estimate(rcot)
+            graph_rcot = pc.estimate(rcot, verbose=True)
             graph_rcot.save(result_folder + '/graph-rcot')
 
             with open(result_folder + '/end-rcot.lock', 'w') as f:

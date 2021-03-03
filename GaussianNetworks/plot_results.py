@@ -1,9 +1,13 @@
+import os
+import subprocess
 import numpy as np
 import pandas as pd
 import glob
 from pybnesian import load
 import matplotlib.pyplot as plt
 import experiments_helper
+import adjusted_pvalues
+import plot_cd_diagram
 
 import tikzplotlib
 
@@ -42,122 +46,303 @@ COLOR4 = "#00000080"
 def extract_info(train_datasets, test_datasets, model_folders, true_models):
     patience = experiments_helper.PATIENCE
 
+    tests = experiments_helper.TESTS
+
     slogl_true = np.empty((len(train_datasets,)))
-    slogl_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
-    slogl_gbn_val = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
-    slogl_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
-    slogl_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
+    slogl_hc_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
+    slogl_hc_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
+    slogl_hc_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    slogl_hc_spbn_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    slogl_pc_gbn = np.empty((len(train_datasets), len(train_datasets[0]), len(tests)))
+    slogl_pc_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(tests), len(patience)))
+    slogl_pc_spbn_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(tests), len(patience)))
 
-    hmd_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
-    hmd_gbn_val = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
-    hmd_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
-    hmd_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
+    hmd_hc_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
+    hmd_hc_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
+    hmd_hc_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    hmd_hc_spbn_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    hmd_pc = np.empty((len(train_datasets), len(train_datasets[0]), len(tests)))
 
-    shd_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
-    shd_gbn_val = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
-    shd_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
-    shd_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
+    shd_hc_gbn_bic = np.empty((len(train_datasets), len(train_datasets[0])))
+    shd_hc_gbn_bge = np.empty((len(train_datasets), len(train_datasets[0])))
+    shd_hc_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    shd_hc_spbn_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    shd_pc = np.empty((len(train_datasets), len(train_datasets[0]), len(tests)))
 
-    thd_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    thd_hc_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    thd_hc_spbn_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(patience)))
+    thd_pc_spbn = np.empty((len(train_datasets), len(train_datasets[0]), len(tests), len(patience)))
+    thd_pc_spbn_ckde = np.empty((len(train_datasets), len(train_datasets[0]), len(tests), len(patience)))
 
     for idx_dataset, (instance_datasets, test_data, dataset_folders, true_model) in enumerate(
             zip(train_datasets, test_datasets, model_folders, true_models)):
         for idx_instances, (training_data, folder) in enumerate(zip(instance_datasets, dataset_folders)):
 
             slogl_true[idx_dataset] = true_model.slogl(test_data)
-            for idx_p, p in enumerate(patience):
-                ckde_folder = folder + '/SPBN/' + str(p)
 
-                all_models = sorted(glob.glob(ckde_folder + '/*.pickle'))
+            ###########################
+            # GBN BIC
+            ###########################
+            gbn_bic_folder = folder + '/HillClimbing/GBN_BIC/'
+
+            all_models = sorted(glob.glob(gbn_bic_folder + '/*.pickle'))
+            final_model = all_models[-1]
+
+            bic = load(final_model)
+            bic.fit(training_data)
+
+            slogl_hc_gbn_bic[idx_dataset, idx_instances] = bic.slogl(test_data)
+            hmd_hc_gbn_bic[idx_dataset, idx_instances] = experiments_helper.hamming(bic, true_model)
+            shd_hc_gbn_bic[idx_dataset, idx_instances] = experiments_helper.shd(bic, true_model)
+
+
+            ###########################
+            # GBN BGe
+            ###########################
+            gbn_bge_folder = folder + '/HillClimbing/GBN_BGe/'
+
+            all_models = sorted(glob.glob(gbn_bge_folder + '/*.pickle'))
+            final_model = all_models[-1]
+
+            bge = load(final_model)
+            bge.fit(training_data)
+
+            slogl_hc_gbn_bge[idx_dataset, idx_instances] = bge.slogl(test_data)
+            hmd_hc_gbn_bge[idx_dataset, idx_instances] = experiments_helper.hamming(bge, true_model)
+            shd_hc_gbn_bge[idx_dataset, idx_instances] = experiments_helper.shd(bge, true_model)
+
+            ###########################
+            # HC SPBN
+            ###########################
+            for idx_p, p in enumerate(patience):
+                spbn_hc_folder = folder + '/HillClimbing/SPBN/' + str(p)
+
+                all_models = sorted(glob.glob(spbn_hc_folder + '/*.pickle'))
                 final_model = all_models[-1]
 
                 spbn = load(final_model)
                 spbn.fit(training_data)
 
-                slogl_spbn[idx_dataset, idx_instances, idx_p] = spbn.slogl(test_data)
-                hmd_spbn[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming(spbn, true_model)
-                shd_spbn[idx_dataset, idx_instances, idx_p] = experiments_helper.shd(spbn, true_model)
-                thd_spbn[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming_type(spbn, true_model)
+                slogl_hc_spbn[idx_dataset, idx_instances, idx_p] = spbn.slogl(test_data)
+                hmd_hc_spbn[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming(spbn, true_model)
+                shd_hc_spbn[idx_dataset, idx_instances, idx_p] = experiments_helper.shd(spbn, true_model)
+                thd_hc_spbn[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming_type(spbn)
 
+            ###########################
+            # HC SPBN CKDE
+            ###########################
             for idx_p, p in enumerate(patience):
-                gbn_val_folder = folder + '/GBN_Validation/' + str(p)
+                spbn_ckde_hc_folder = folder + '/HillClimbing/SPBN_CKDE/' + str(p)
 
-                all_models = sorted(glob.glob(gbn_val_folder + '/*.pickle'))
+                all_models = sorted(glob.glob(spbn_ckde_hc_folder + '/*.pickle'))
                 final_model = all_models[-1]
 
-                gbn = load(final_model)
-                gbn.fit(training_data)
+                spbn_ckde = load(final_model)
+                spbn_ckde.fit(training_data)
 
-                slogl_gbn_val[idx_dataset, idx_instances, idx_p] = gbn.slogl(test_data)
-                hmd_gbn_val[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming(gbn, true_model)
-                shd_gbn_val[idx_dataset, idx_instances, idx_p] = experiments_helper.shd(gbn, true_model)
+                slogl_hc_spbn_ckde[idx_dataset, idx_instances, idx_p] = spbn_ckde.slogl(test_data)
+                hmd_hc_spbn_ckde[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming(spbn_ckde, true_model)
+                shd_hc_spbn_ckde[idx_dataset, idx_instances, idx_p] = experiments_helper.shd(spbn_ckde, true_model)
+                thd_hc_spbn_ckde[idx_dataset, idx_instances, idx_p] = experiments_helper.hamming_type(spbn_ckde)
 
-            gbn_bic_folder = folder + '/GBN_BIC/'
+            ###########################
+            # PC GBN and PC Graph
+            ###########################
+            for idx_t, test in enumerate(tests):
+                gbn_pc_folder = folder + '/PC/GBN/' + test
+                
+                all_models = sorted(glob.glob(gbn_pc_folder + '/*.pickle'))
+                final_model = all_models[-1]
 
-            all_models = sorted(glob.glob(gbn_bic_folder + '/*.pickle'))
-            final_model = all_models[-1]
+                gbn_pc = load(final_model)
+                gbn_pc.fit(training_data)
 
-            gbn = load(final_model)
-            gbn.fit(training_data)
+                slogl_pc_gbn[idx_dataset, idx_instances, idx_t] = gbn_pc.slogl(test_data)
+                hmd_pc[idx_dataset, idx_instances, idx_t] = experiments_helper.hamming(gbn_pc, true_model)
+                shd_pc[idx_dataset, idx_instances, idx_t] = experiments_helper.shd(gbn_pc, true_model)
 
-            slogl_gbn_bic[idx_dataset, idx_instances] = gbn.slogl(test_data)
-            hmd_gbn_bic[idx_dataset, idx_instances] = experiments_helper.hamming(gbn, true_model)
-            shd_gbn_bic[idx_dataset, idx_instances] = experiments_helper.shd(gbn, true_model)
+            ###########################
+            # PC SPBN
+            ###########################
+            for idx_t, test in enumerate(tests):
+                for idx_p, p in enumerate(patience):
+                    spbn_pc_folder = folder + '/PC/SPBN/' + test + '/' + str(p)
 
-            gbn_bge_folder = folder + '/GBN_BGe/'
+                    all_models = sorted(glob.glob(spbn_pc_folder + '/*.pickle'))
+                    final_model = all_models[-1]
 
-            all_models = sorted(glob.glob(gbn_bge_folder + '/*.pickle'))
-            final_model = all_models[-1]
+                    spbn_pc = load(final_model)
+                    spbn_pc.fit(training_data)
 
-            gbn = load(final_model)
-            gbn.fit(training_data)
+                    slogl_pc_spbn[idx_dataset, idx_instances, idx_t, idx_p] = spbn_pc.slogl(test_data)
+                    thd_pc_spbn[idx_dataset, idx_instances, idx_t, idx_p] = experiments_helper.hamming_type(spbn_pc)
 
-            slogl_gbn_bge[idx_dataset, idx_instances] = gbn.slogl(test_data)
-            hmd_gbn_bge[idx_dataset, idx_instances] = experiments_helper.hamming(gbn, true_model)
-            shd_gbn_bge[idx_dataset, idx_instances] = experiments_helper.shd(gbn, true_model)
+            ###########################
+            # PC SPBN CKDE
+            ###########################
+            for idx_t, test in enumerate(tests):
+                for idx_p, p in enumerate(patience):
+                    spbn_ckde_pc_folder = folder + '/PC/SPBN_CKDE/' + test + '/' + str(p)
 
-    return (slogl_true, slogl_spbn, slogl_gbn_val, slogl_gbn_bic, slogl_gbn_bge), \
-           (hmd_spbn, hmd_gbn_val, hmd_gbn_bic, hmd_gbn_bge), \
-           (shd_spbn, shd_gbn_val, shd_gbn_bic, shd_gbn_bge),\
-           thd_spbn
+                    all_models = sorted(glob.glob(spbn_ckde_pc_folder + '/*.pickle'))
+                    final_model = all_models[-1]
+
+                    spbn_ckde_pc = load(final_model)
+                    spbn_ckde_pc.fit(training_data)
+
+                    slogl_pc_spbn_ckde[idx_dataset, idx_instances, idx_t, idx_p] = spbn_ckde_pc.slogl(test_data)
+                    thd_pc_spbn_ckde[idx_dataset, idx_instances, idx_t, idx_p] = experiments_helper.hamming_type(spbn_ckde_pc)
 
 
-def plot_likelihood(train_datasets, test_datasets, model_folders, true_models):
-    patience = experiments_helper.PATIENCE
+    return (slogl_true, slogl_hc_gbn_bic, slogl_hc_gbn_bge, slogl_hc_spbn, slogl_hc_spbn_ckde, slogl_pc_gbn, slogl_pc_spbn, slogl_pc_spbn_ckde), \
+           (hmd_hc_gbn_bic, hmd_hc_gbn_bge, hmd_hc_spbn, hmd_hc_spbn_ckde, hmd_pc), \
+           (shd_hc_gbn_bic, shd_hc_gbn_bge, shd_hc_spbn, shd_hc_spbn_ckde, shd_pc),\
+           (thd_hc_spbn, thd_hc_spbn_ckde, thd_pc_spbn, thd_pc_spbn_ckde)
+
+def plot_table(train_datasets, test_datasets, model_folders, true_models):
+    loglikelihood_info, _, _, _ = extract_info(train_datasets, test_datasets, model_folders, true_models)
+    (slogl_true, slogl_hc_gbn_bic, slogl_hc_gbn_bge, slogl_hc_spbn,
+    slogl_hc_spbn_ckde, slogl_pc_gbn, slogl_pc_spbn, slogl_pc_spbn_ckde) = loglikelihood_info
+
+    for i in range(0, 4, 2):
+        line = "GBN BIC"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_hc_gbn_bic[j, idx_inst], 2)) + "$"
+        line += "\\\\\n"
+
+        line += "GBN BGe"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_hc_gbn_bge[j, idx_inst], 2)) + "$"
+        line += "\\\\\n"
+
+        line += "HC SPBN-LG"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_hc_spbn[j, idx_inst, 1], 2)) + "$"
+        line += "\\\\\n"
+
+        line += "HC SPBN-CKDE"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_hc_spbn_ckde[j, idx_inst, 1], 2)) + "$"
+        line += "\\\\\n"
+
+        line += "PC-PLC GBN"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_pc_gbn[j, idx_inst, 0], 2)) + "$"
+        line += "\\\\\n"
+
+        line += "PC-RCoT GBN"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_pc_gbn[j, idx_inst, 1], 2)) + "$"
+        line += "\\\\\n"
+
+        line += "PC-PLC SPBN-LG"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_pc_spbn[j, idx_inst, 0, 1], 2)) + "$"
+        line += "\\\\\n"
+
+        line += "PC-RCoT SPBN-LG"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_pc_spbn[j, idx_inst, 1, 1], 2)) + "$"
+        line += "\\\\\n"
+
+        line += "PC-PLC SPBN-CKDE"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_pc_spbn_ckde[j, idx_inst, 0, 1], 2)) + "$"
+        line += "\\\\\n"
+
+        line += "PC-RCoT SPBN-CKDE"
+        for j in range(i, i+2):
+            for idx_inst, inst in enumerate(experiments_helper.INSTANCES):
+                line += "&$" + str(round(slogl_pc_spbn_ckde[j, idx_inst, 1, 1], 2)) + "$"
+        line += "\\\\\n"
+
+        print(line)
+
+
+
+def print_apv(avgranks, names, type="bergmann"):
+    if type == "bergmann":
+        apv = adjusted_pvalues.bergmann_hommel(avgranks, names)
+    elif type == "holm":
+        apv = adjusted_pvalues.holm(avgranks, names)
+
+    for (pvalue, (alg1, alg2)) in apv:
+        print(alg1 + " vs " + alg2  + ": " + str(pvalue))
+
+
+def plot_cd_diagrams(train_datasets, test_datasets, model_folders, true_models, rename_dict):
 
     loglikelihood_info, _, _, _ = extract_info(train_datasets, test_datasets, model_folders, true_models)
-    slogl_true, slogl_spbn, slogl_gbn_val, slogl_gbn_bic, slogl_gbn_bge = loglikelihood_info
 
-    N = len(train_datasets) * len(train_datasets[0])
-    ind = np.arange(N)
-    b = []
+    (slogl_true, slogl_hc_gbn_bic, slogl_hc_gbn_bge, slogl_hc_spbn,
+    slogl_hc_spbn_ckde, slogl_pc_gbn, slogl_pc_spbn, slogl_pc_spbn_ckde) = loglikelihood_info
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
+    datasets = [d + "_" + str(i) for d in experiments_helper.DATASETS for i in experiments_helper.INSTANCES]
 
-    for idx_p, p in enumerate(patience):
-        t = ax.plot(ind, slogl_spbn[:,:, idx_p].reshape(-1))
-        b.append(t)
+    df_algorithms = pd.DataFrame({"Dataset": datasets})
+    df_algorithms = df_algorithms.set_index("Dataset")
 
-    for idx_p, p in enumerate(patience):
-        t = ax.plot(ind, slogl_gbn_val[:, :, idx_p].reshape(-1))
-        b.append(t)
+    df_algorithms["BIC"] = slogl_hc_gbn_bic.reshape(-1)
+    df_algorithms["BGe"] = slogl_hc_gbn_bge.reshape(-1)
 
-    t = ax.plot(ind, slogl_gbn_bic[:, :].reshape(-1))
-    b.append(t)
+    # for idx_p, p in enumerate(experiments_helper.PATIENCE):
+    df_algorithms["HC_SPBN_5"] = slogl_hc_spbn[:,:,1].reshape(-1)
+    df_algorithms["HC_SPBN_CKDE_5"] = slogl_hc_spbn_ckde[:,:,1].reshape(-1)
 
-    t = ax.plot(ind, slogl_gbn_bge[:, :].reshape(-1))
-    b.append(t)
-    plt.show()
+    for idx_t, test in enumerate(experiments_helper.TESTS):
+        df_algorithms["PC_GBN_" + test + "_5"] = slogl_pc_gbn[:,:, idx_t].reshape(-1)
+        df_algorithms["PC_SPBN_" + test + "_5"] = slogl_pc_spbn[:,:, idx_t, 1].reshape(-1)
+        df_algorithms["PC_SPBN_CKDE_" + test + "_5"] = slogl_pc_spbn_ckde[:,:, idx_t, 1].reshape(-1)
+
+    df_algorithms = df_algorithms.filter(regex="_10000", axis=0)
+
+    rank = df_algorithms.rank(axis=1, ascending=False)
+    avgranks = rank.mean().to_numpy()
+    names = rank.columns.values
+
+    print_apv(avgranks, names)
+    input("Press [Enter]:")
+
+    names = [rename_dict[s] for s in names]
+
+    plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="cd")
+    tikzplotlib.save("plots/Nemenyi_spbn.tex", standalone=True, axis_width="14cm", axis_height="5cm")
+
+    plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="holm")
+    tikzplotlib.save("plots/Holm_spbn.tex", standalone=True, axis_width="14cm", axis_height="5cm")
+
+    plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="bergmann")
+    tikzplotlib.save("plots/Bergmann_spbn.tex", standalone=True, axis_width="14cm", axis_height="5cm")
+
+    os.chdir("plots")
+    process = subprocess.Popen('pdflatex Nemenyi_spbn.tex'.split())
+    process.wait()
+    process = subprocess.Popen('pdflatex Holm_spbn.tex'.split())
+    process.wait()
+    process = subprocess.Popen('pdflatex Bergmann_spbn.tex'.split())
+    process.wait()
+    process = subprocess.Popen('evince Bergmann_spbn.pdf'.split())
+    process.wait()
+    os.chdir("..")
+    return df_algorithms
 
 def plot_hmd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names):
-    patience = experiments_helper.PATIENCE
+    tests = experiments_helper.TESTS
 
     _, hmd_info, _, _ = extract_info(train_datasets, test_datasets, model_folders, true_models)
-    hmd_spbn, hmd_gbn_val, hmd_gbn_bic, hmd_gbn_bge = hmd_info
+    hmd_hc_gbn_bic, hmd_hc_gbn_bge, hmd_hc_spbn, hmd_hc_spbn_ckde, hmd_pc = hmd_info
 
     N = len(train_datasets) * len(train_datasets[0])
-    num_bars = len(patience)*2 + 2
+    num_bars = len(tests)*2 + 2
     ind = np.arange(N, dtype=np.float64)
 
     # Between dataset groups separation
@@ -174,30 +359,35 @@ def plot_hmd(train_datasets, test_datasets, model_folders, true_models, dataset_
 
     offset = 0
 
-    for idx_p, p in enumerate(patience):
-        t = ax.bar(ind+width*offset, hmd_spbn[:,:, idx_p].reshape(-1), width, color=COLOR1, linewidth=0.5,
+    t = ax.bar(ind+width*offset, hmd_hc_spbn[:,:, 1].reshape(-1), width, color=COLOR1, linewidth=0.5,
                    align='edge', edgecolor="black")
-        offset += 1
-        if p == 5:
-            for bar in t:
-                bar.set_hatch('//')
-        b.append(t)
+    offset += 1
+    b.append(t)
 
-    for idx_p, p in enumerate(patience):
-        t = ax.bar(ind+width*offset, hmd_gbn_val[:,:, idx_p].reshape(-1), width, color=COLOR2, linewidth=0.5,
+    t = ax.bar(ind+width*offset, hmd_hc_spbn_ckde[:,:, 1].reshape(-1), width, color=COLOR1, linewidth=0.5,
                    align='edge', edgecolor="black")
-        offset += 1
-        if p == 5:
-            for bar in t:
-                bar.set_hatch('//')
-        b.append(t)
+    offset += 1
+    for bar in t:
+        bar.set_hatch('//')
+    b.append(t)
 
-    t = ax.bar(ind + width * offset, hmd_gbn_bic[:,:].reshape(-1), width, color=COLOR3, linewidth=0.5,
+    t = ax.bar(ind+width*offset, hmd_pc[:,:, 0].reshape(-1), width, color=COLOR2, linewidth=0.5,
+                   align='edge', edgecolor="black")
+    offset += 1
+
+    t = ax.bar(ind+width*offset, hmd_pc[:,:, 1].reshape(-1), width, color=COLOR2, linewidth=0.5,
+                   align='edge', edgecolor="black")
+    offset += 1
+    for bar in t:
+        bar.set_hatch('//')
+    b.append(t)
+
+    t = ax.bar(ind + width * offset, hmd_hc_gbn_bic[:,:].reshape(-1), width, color=COLOR3, linewidth=0.5,
                align='edge', edgecolor="black")
     offset += 1
     b.append(t)
 
-    t = ax.bar(ind + width * offset, hmd_gbn_bge[:,:].reshape(-1), width, color=COLOR4, linewidth=0.5,
+    t = ax.bar(ind + width * offset, hmd_hc_gbn_bge[:,:].reshape(-1), width, color=COLOR4, linewidth=0.5,
                align='edge', edgecolor="black")
     offset += 1
     b.append(t)
@@ -222,13 +412,13 @@ def plot_hmd(train_datasets, test_datasets, model_folders, true_models, dataset_
     tikzplotlib.save("plots/hmd.tex", standalone=True, axis_width="25cm", axis_height="10cm")
 
 def plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names):
-    patience = [0, 5]
+    tests = experiments_helper.TESTS
 
     _, _, shd_info, _ = extract_info(train_datasets, test_datasets, model_folders, true_models)
-    shd_spbn, shd_gbn_val, shd_gbn_bic, shd_gbn_bge = shd_info
+    shd_hc_gbn_bic, shd_hc_gbn_bge, shd_hc_spbn, shd_hc_spbn_ckde, shd_pc = shd_info
 
     N = len(train_datasets) * len(train_datasets[0])
-    num_bars = len(patience)*2 + 2
+    num_bars = len(tests)*2 + 2
     ind = np.arange(N, dtype=np.float64)
 
     # Between dataset groups separation
@@ -245,30 +435,35 @@ def plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_
 
     offset = 0
 
-    for idx_p, p in enumerate(patience):
-        t = ax.bar(ind+width*offset, shd_spbn[:,:, idx_p].reshape(-1), width, color=COLOR1, linewidth=0.5,
+    t = ax.bar(ind+width*offset, shd_hc_spbn[:,:, 1].reshape(-1), width, color=COLOR1, linewidth=0.5,
                    align='edge', edgecolor="black")
-        offset += 1
-        if p == 5:
-            for bar in t:
-                bar.set_hatch('//')
-        b.append(t)
+    offset += 1
+    b.append(t)
 
-    for idx_p, p in enumerate(patience):
-        t = ax.bar(ind+width*offset, shd_gbn_val[:,:, idx_p].reshape(-1), width, color=COLOR2, linewidth=0.5,
+    t = ax.bar(ind+width*offset, shd_hc_spbn_ckde[:,:, 1].reshape(-1), width, color=COLOR1, linewidth=0.5,
                    align='edge', edgecolor="black")
-        offset += 1
-        if p == 5:
-            for bar in t:
-                bar.set_hatch('//')
-        b.append(t)
+    offset += 1
+    for bar in t:
+        bar.set_hatch('//')
+    b.append(t)
 
-    t = ax.bar(ind + width * offset, shd_gbn_bic[:,:].reshape(-1), width, color=COLOR3, linewidth=0.5,
+    t = ax.bar(ind+width*offset, shd_pc[:,:, 0].reshape(-1), width, color=COLOR2, linewidth=0.5,
+                   align='edge', edgecolor="black")
+    offset += 1
+
+    t = ax.bar(ind+width*offset, shd_pc[:,:, 1].reshape(-1), width, color=COLOR2, linewidth=0.5,
+                   align='edge', edgecolor="black")
+    offset += 1
+    for bar in t:
+        bar.set_hatch('//')
+    b.append(t)
+
+    t = ax.bar(ind + width * offset, shd_hc_gbn_bic[:,:].reshape(-1), width, color=COLOR3, linewidth=0.5,
                align='edge', edgecolor="black")
     offset += 1
     b.append(t)
 
-    t = ax.bar(ind + width * offset, shd_gbn_bge[:,:].reshape(-1), width, color=COLOR4, linewidth=0.5,
+    t = ax.bar(ind + width * offset, shd_hc_gbn_bge[:,:].reshape(-1), width, color=COLOR4, linewidth=0.5,
                align='edge', edgecolor="black")
     offset += 1
     b.append(t)
@@ -293,13 +488,13 @@ def plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_
     tikzplotlib.save("plots/shd.tex", standalone=True, axis_width="25cm", axis_height="10cm")
 
 def plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names):
-    patience = [5]
+    tests = experiments_helper.TESTS
 
-    _, _, _, thd_spbn = extract_info(train_datasets, test_datasets, model_folders, true_models)
-    # shd_ckde, shd_gbn_val, shd_gbn_bic, shd_gbn_bge = shd_info
+    _, _, _, thd_info = extract_info(train_datasets, test_datasets, model_folders, true_models)
+    thd_hc_spbn, thd_hc_spbn_ckde, thd_pc_spbn, thd_pc_spbn_ckde = thd_info
 
     N = len(train_datasets) * len(train_datasets[0])
-    num_bars = len(patience)
+    num_bars = 6
     ind = np.arange(N, dtype=np.float64)
 
     # Between dataset groups separation
@@ -316,10 +511,37 @@ def plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_
 
     offset = 0
 
-    # for idx_p, p in enumerate(patience):
-    # print(ind+width*offset)
-    t = ax.bar(ind+width*offset, thd_spbn[:,:,1].reshape(-1), width, color=COLOR1, linewidth=0.5,
-               align='edge', edgecolor="black")
+    t = ax.bar(ind+width*offset, thd_hc_spbn[:,:, 1].reshape(-1), width, color=COLOR1, linewidth=0.5,
+                   align='edge', edgecolor="black")
+    offset += 1
+    b.append(t)
+
+    t = ax.bar(ind+width*offset, thd_hc_spbn_ckde[:,:, 1].reshape(-1), width, color=COLOR1, linewidth=0.5,
+                   align='edge', edgecolor="black")
+    offset += 1
+    for bar in t:
+        bar.set_hatch('//')
+    b.append(t)
+
+    t = ax.bar(ind+width*offset, thd_pc_spbn[:,:,0,1].reshape(-1), width, color=COLOR2, linewidth=0.5,
+                   align='edge', edgecolor="black")
+    offset += 1
+    b.append(t)
+
+    t = ax.bar(ind+width*offset, thd_pc_spbn_ckde[:,:,0,1].reshape(-1), width, color=COLOR2, linewidth=0.5,
+                   align='edge', edgecolor="black")
+    offset += 1
+    for bar in t:
+        bar.set_hatch('//')
+    b.append(t)
+
+    t = ax.bar(ind+width*offset, thd_pc_spbn[:,:,1,1].reshape(-1), width, color=COLOR3, linewidth=0.5,
+                   align='edge', edgecolor="black")
+    offset += 1
+    b.append(t)
+
+    t = ax.bar(ind+width*offset, thd_pc_spbn_ckde[:,:,1,1].reshape(-1), width, color=COLOR3, linewidth=0.5,
+                   align='edge', edgecolor="black")
     offset += 1
     for bar in t:
         bar.set_hatch('//')
@@ -368,7 +590,21 @@ if __name__ == '__main__':
     dataset_names = ["ECOLI70", "MAGIC-NIAB", "MAGIC-IRRI", "ARTH150"]
     instance_names = ["200", "2000", "10000"]
 
-    # plot_likelihood(train_datasets, test_datasets, model_folders, true_models)
-    # plot_hmd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)
-    # plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)
+    rename_dict = {
+        'BIC': r'GBN BIC',
+        'BGe': r'GBN BGe',
+        'HC_SPBN_5': r'HC SPBN-LG',
+        'HC_SPBN_CKDE_5': r'HC SPBN-CKDE',
+        'PC_GBN_LinearCorrelation_5': r'PC-PLC GBN',
+        'PC_GBN_RCoT_5': r'PC-RCoT GBN',
+        'PC_SPBN_LinearCorrelation_5': r'PC-PLC SPBN-LG',
+        'PC_SPBN_RCoT_5': r'PC-RCoT SPBN-LG',
+        'PC_SPBN_CKDE_LinearCorrelation_5': r'PC-PLC SPBN-CKDE',
+        'PC_SPBN_CKDE_RCoT_5': r'PC-RCoT SPBN-CKDE',
+    }
+
+    # plot_table(train_datasets, test_datasets, model_folders, true_models,)
+    # plot_cd_diagrams(train_datasets, test_datasets, model_folders, true_models, rename_dict)
+    plot_hmd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)
+    plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)
     plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)

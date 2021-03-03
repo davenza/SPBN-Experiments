@@ -32,23 +32,38 @@ arth150_10000 = pd.read_csv("arth150_10000.csv")
 arth150_test = pd.read_csv("arth150_test.csv")
 
 
-def compare_models(true_model, trained_models_folder, training_data, test_data, patience):
+def compare_models(true_model, trained_models_folder, training_data, test_data):
     ground_truth_slogl = true_model.slogl(test_data)
 
     print("Ground truth loglik: " + str(ground_truth_slogl))
-    print("SPBN results:")
-    for p in patience:
-        ckde_folder = trained_models_folder + '/HillClimbing/SPBN/' + str(p)
 
-        all_models = sorted(glob.glob(ckde_folder + '/*.pickle'))
+    for p in experiments_helper.PATIENCE:
+        folder = trained_models_folder + '/PC/SPBN/LinearCorrelation/' + str(p)
+        all_models = sorted(glob.glob(folder + '/*.pickle'))
         final_model = all_models[-1]
 
         spbn = load(final_model)
         spbn.fit(training_data)
 
-        logl = spbn.slogl(test_data)
+        slogl = spbn.slogl(test_data)
+        print("SPBN LinearCorrelation results:")
+        print("Loglik, p " + str(p) + ": " + str(slogl))
+        print("SHD, p " + str(p) + ": " + str(experiments_helper.shd(spbn, true_model)))
+        print("Hamming, p " + str(p) + ": " + str(experiments_helper.hamming(spbn, true_model)))
+        print("Type Hamming, p " + str(p) + ": " + str(experiments_helper.hamming_type(spbn)))
+        print()
 
-        print("Loglik, p " + str(p) + ": " + str(logl))
+    for p in experiments_helper.PATIENCE:
+        folder = trained_models_folder + '/PC/SPBN/RCoT/' + str(p)
+        all_models = sorted(glob.glob(folder + '/*.pickle'))
+        final_model = all_models[-1]
+
+        spbn = load(final_model)
+        spbn.fit(training_data)
+
+        slogl = spbn.slogl(test_data)
+        print("SPBN RCoT results:")
+        print("Loglik, p " + str(p) + ": " + str(slogl))
         print("SHD, p " + str(p) + ": " + str(experiments_helper.shd(spbn, true_model)))
         print("Hamming, p " + str(p) + ": " + str(experiments_helper.hamming(spbn, true_model)))
         print("Type Hamming, p " + str(p) + ": " + str(experiments_helper.hamming_type(spbn)))
@@ -79,6 +94,6 @@ for true_model, name, folders, training_datasets, test_dataset in \
     for folder, training_dataset in zip(folders, training_datasets):
         print(folder)
         print()
-        compare_models(true_model, folder, training_dataset, test_dataset, experiments_helper.PATIENCE)
+        compare_models(true_model, folder, training_dataset, test_dataset)
 
     print()

@@ -32,27 +32,38 @@ arth150_10000 = pd.read_csv("arth150_10000.csv")
 arth150_test = pd.read_csv("arth150_test.csv")
 
 
-def compare_models(true_model, trained_models_folder, training_data, test_data, patience):
+def compare_models(true_model, trained_models_folder, training_data, test_data):
     ground_truth_slogl = true_model.slogl(test_data)
 
     print("Ground truth loglik: " + str(ground_truth_slogl))
-    print("SPBN results:")
-    for p in patience:
-        ckde_folder = trained_models_folder + '/HillClimbing/SPBN/' + str(p)
 
-        all_models = sorted(glob.glob(ckde_folder + '/*.pickle'))
-        final_model = all_models[-1]
+    gbn_bic_folder = trained_models_folder + '/PC/GBN/LinearCorrelation'
+    all_models = sorted(glob.glob(gbn_bic_folder + '/*.pickle'))
+    final_model = all_models[-1]
 
-        spbn = load(final_model)
-        spbn.fit(training_data)
+    gbn = load(final_model)
+    gbn.fit(training_data)
 
-        logl = spbn.slogl(test_data)
+    slogl = gbn.slogl(test_data)
+    print("GBN LinearCorrelation results:")
+    print("Loglik: " + str(slogl))
+    print("SHD: " + str(experiments_helper.shd(gbn, true_model)))
+    print("Hamming: " + str(experiments_helper.hamming(gbn, true_model)))
+    print()
 
-        print("Loglik, p " + str(p) + ": " + str(logl))
-        print("SHD, p " + str(p) + ": " + str(experiments_helper.shd(spbn, true_model)))
-        print("Hamming, p " + str(p) + ": " + str(experiments_helper.hamming(spbn, true_model)))
-        print("Type Hamming, p " + str(p) + ": " + str(experiments_helper.hamming_type(spbn)))
-        print()
+    gbn_bge_folder = trained_models_folder + '/PC/GBN/RCoT'
+    all_models = sorted(glob.glob(gbn_bge_folder + '/*.pickle'))
+    final_model = all_models[-1]
+
+    gbn = load(final_model)
+    gbn.fit(training_data)
+
+    slogl = gbn.slogl(test_data)
+    print("GBN RCoT results:")
+    print("Loglik: " + str(slogl))
+    print("SHD: " + str(experiments_helper.shd(gbn, true_model)))
+    print("Hamming: " + str(experiments_helper.hamming(gbn, true_model)))
+    print()
 
 for true_model, name, folders, training_datasets, test_dataset in \
         zip([ecoli70_true, magic_niab_true, magic_irri_true, arth150_true],
@@ -79,6 +90,6 @@ for true_model, name, folders, training_datasets, test_dataset in \
     for folder, training_dataset in zip(folders, training_datasets):
         print(folder)
         print()
-        compare_models(true_model, folder, training_dataset, test_dataset, experiments_helper.PATIENCE)
+        compare_models(true_model, folder, training_dataset, test_dataset)
 
     print()

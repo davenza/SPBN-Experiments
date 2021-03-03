@@ -32,27 +32,10 @@ arth150_10000 = pd.read_csv("arth150_10000.csv")
 arth150_test = pd.read_csv("arth150_test.csv")
 
 
-def compare_models(true_model, trained_models_folder, training_data, test_data, patience):
+def compare_models(true_model, trained_models_folder, training_data, test_data):
     ground_truth_slogl = true_model.slogl(test_data)
 
     print("Ground truth loglik: " + str(ground_truth_slogl))
-
-    print("GBN Validation results:")
-    for p in patience:
-        gbn_val_folder = trained_models_folder + '/HillClimbing/GBN_Validation/' + str(p)
-
-        all_models = sorted(glob.glob(gbn_val_folder + '/*.pickle'))
-        final_model = all_models[-1]
-
-        gbn = load(final_model)
-        gbn.fit(training_data)
-
-        slogl = gbn.slogl(test_data)
-
-        print("Loglik, p " + str(p) + ": " + str(slogl))
-        print("SHD, p " + str(p) + ": " + str(experiments_helper.shd(gbn, true_model)))
-        print("Hamming, p " + str(p) + ": " + str(experiments_helper.hamming(gbn, true_model)))
-        print()
 
     gbn_bic_folder = trained_models_folder + '/HillClimbing/GBN_BIC/'
     all_models = sorted(glob.glob(gbn_bic_folder + '/*.pickle'))
@@ -77,7 +60,7 @@ def compare_models(true_model, trained_models_folder, training_data, test_data, 
 
     slogl = gbn.slogl(test_data)
     print("GBN BGe results:")
-    print("Loglik: " + str(slogl)
+    print("Loglik: " + str(slogl))
     print("SHD: " + str(experiments_helper.shd(gbn, true_model)))
     print("Hamming: " + str(experiments_helper.hamming(gbn, true_model)))
     print()
@@ -107,6 +90,6 @@ for true_model, name, folders, training_datasets, test_dataset in \
     for folder, training_dataset in zip(folders, training_datasets):
         print(folder)
         print()
-        compare_models(true_model, folder, training_dataset, test_dataset, experiments_helper.PATIENCE)
+        compare_models(true_model, folder, training_dataset, test_dataset)
 
     print()

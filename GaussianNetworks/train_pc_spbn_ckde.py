@@ -1,6 +1,7 @@
 import glob
 import pandas as pd
 from pybnesian import load
+from pybnesian.factors import NodeType
 from pybnesian.models import SemiparametricBN
 from pybnesian.learning.algorithms import GreedyHillClimbing
 from pybnesian.learning.algorithms.callbacks import SaveModel
@@ -29,12 +30,13 @@ for d in experiments_helper.DATASETS:
         vl = ValidatedLikelihood(df, k=10, seed=experiments_helper.SEED)
 
         for p in experiments_helper.PATIENCE:
-            result_folder = 'models/' + d + '/' + str(i) + '/PC/SPBN/LinearCorrelation/' + str(p)
+            result_folder = 'models/' + d + '/' + str(i) + '/PC/SPBN_CKDE/LinearCorrelation/' + str(p)
             pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
 
             if not os.path.exists(result_folder + '/end.lock'):
                 cb_save = SaveModel(result_folder)
-                start_model = SemiparametricBN(dag_lc)
+                node_types = [(name, NodeType.CKDE) for name in df.columns.values]
+                start_model = SemiparametricBN(dag_lc, node_types)
                 bn = hc.estimate(change_node, vl, start_model, callback=cb_save, patience=p)
 
                 iters = sorted(glob.glob(result_folder + '/*.pickle'))
@@ -56,12 +58,13 @@ for d in experiments_helper.DATASETS:
         vl = ValidatedLikelihood(df, k=10, seed=experiments_helper.SEED)
 
         for p in experiments_helper.PATIENCE:
-            result_folder = 'models/' + d + '/' + str(i) + '/PC/SPBN/RCoT/' + str(p)
+            result_folder = 'models/' + d + '/' + str(i) + '/PC/SPBN_CKDE/RCoT/' + str(p)
             pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
 
             if not os.path.exists(result_folder + '/end.lock'):
                 cb_save = SaveModel(result_folder)
-                start_model = SemiparametricBN(dag_rcot)
+                node_types = [(name, NodeType.CKDE) for name in df.columns.values]
+                start_model = SemiparametricBN(dag_rcot, node_types)
                 bn = hc.estimate(change_node, vl, start_model, callback=cb_save, patience=p)
 
                 iters = sorted(glob.glob(result_folder + '/*.pickle'))

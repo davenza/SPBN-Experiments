@@ -38,7 +38,7 @@ def compare_models(true_model, trained_models_folder, training_data, test_data, 
     print("Ground truth loglik: " + str(ground_truth_slogl))
     print("SPBN results:")
     for p in patience:
-        ckde_folder = trained_models_folder + '/HillClimbing/SPBN/' + str(p)
+        ckde_folder = trained_models_folder + '/HillClimbing/SPBN_CKDE/' + str(p)
 
         all_models = sorted(glob.glob(ckde_folder + '/*.pickle'))
         final_model = all_models[-1]

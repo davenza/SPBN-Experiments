@@ -5,10 +5,6 @@ import pathlib
 import os
 import experiments_helper
 
-hc = GreedyHillClimbing()
-change_node = ChangeNodeTypeSet()
-
-
 for d in experiments_helper.DATASETS:
     for i in experiments_helper.INSTANCES:
         df = pd.read_csv(d + "_"  + str(i) + '.csv')
@@ -18,17 +14,22 @@ for d in experiments_helper.DATASETS:
         try:
             dag_lc = pdag_lc.to_dag()
         except ValueError:
-            dag_lc = experiments_helper.remove_bidirected(pdag_lc)
+            dag_lc = pdag_lc.to_approximate_dag()
+
+        result_folder = 'models/' + d + '/' + str(i) + '/PC/GBN/LinearCorrelation'
+        pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
 
         gbn_lc = GaussianNetwork(dag_lc)
-        gbn_lc.save('models/' + d + '/' + str(i) + '/PC/GBN/LinearCorrelation/000000')
+        gbn_lc.save(result_folder + '/000000')
 
         pdag_rcot = load('models/' + d + '/' + str(i) + '/PC/graph-rcot.pickle')
-
         try:
             dag_rcot = pdag_rcot.to_dag()
         except ValueError:
-            dag_rcot = experiments_helper.remove_bidirected(pdag_rcot)
-
+            dag_rcot = pdag_rcot.to_approximate_dag()
+        
+        result_folder = 'models/' + d + '/' + str(i) + '/PC/GBN/RCoT'
+        pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
+        
         gbn_rcot = GaussianNetwork(dag_rcot)
-        gbn_rcot.save('models/' + d + '/' + str(i) + '/PC/GBN/RCoT/000000')
+        gbn_rcot.save(result_folder + '/000000')

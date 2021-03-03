@@ -1,5 +1,6 @@
 import glob
 import pandas as pd
+from pybnesian.factors import NodeType
 from pybnesian.models import SemiparametricBN
 from pybnesian.learning.algorithms import GreedyHillClimbing
 from pybnesian.learning.algorithms.callbacks import SaveModel
@@ -19,12 +20,13 @@ for d in experiments_helper.DATASETS:
         vl = ValidatedLikelihood(df, k=10, seed=experiments_helper.SEED)
 
         for p in experiments_helper.PATIENCE:
-            result_folder = 'models/' + d + '/' + str(i) + '/HillClimbing/SPBN/' + str(p)
+            result_folder = 'models/' + d + '/' + str(i) + '/HillClimbing/SPBN_CKDE/' + str(p)
             pathlib.Path(result_folder).mkdir(parents=True, exist_ok=True)
 
             if not os.path.exists(result_folder + '/end.lock'):
                 cb_save = SaveModel(result_folder)
-                start_model = SemiparametricBN(list(df.columns.values))
+                node_types = [(name, NodeType.CKDE) for name in df.columns.values]
+                start_model = SemiparametricBN(list(df.columns.values), node_types)
                 bn = hc.estimate(pool, vl, start_model, callback=cb_save, patience=p)
 
                 iters = sorted(glob.glob(result_folder + '/*.pickle'))
