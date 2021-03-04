@@ -92,22 +92,22 @@ def plot_cd_diagrams(rename_dict):
     names = [rename_dict[s] for s in names]
 
     plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="cd")
-    tikzplotlib.save("plots/Nemenyi_spbn.tex", standalone=True, axis_width="14cm", axis_height="5cm")
+    tikzplotlib.save("plots/Nemenyi.tex", standalone=True, axis_width="14cm", axis_height="5cm")
 
     plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="holm")
-    tikzplotlib.save("plots/Holm_spbn.tex", standalone=True, axis_width="14cm", axis_height="5cm")
+    tikzplotlib.save("plots/Holm.tex", standalone=True, axis_width="14cm", axis_height="5cm")
 
     plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="bergmann")
-    tikzplotlib.save("plots/Bergmann_spbn.tex", standalone=True, axis_width="14cm", axis_height="5cm")
+    tikzplotlib.save("plots/Bergmann.tex", standalone=True, axis_width="14cm", axis_height="5cm")
 
     os.chdir("plots")
-    process = subprocess.Popen('pdflatex Nemenyi_spbn.tex'.split())
+    process = subprocess.Popen('pdflatex Nemenyi.tex'.split())
     process.wait()
-    process = subprocess.Popen('pdflatex Holm_spbn.tex'.split())
+    process = subprocess.Popen('pdflatex Holm.tex'.split())
     process.wait()
-    process = subprocess.Popen('pdflatex Bergmann_spbn.tex'.split())
+    process = subprocess.Popen('pdflatex Bergmann.tex'.split())
     process.wait()
-    process = subprocess.Popen('evince Bergmann_spbn.pdf'.split())
+    process = subprocess.Popen('evince Bergmann.pdf'.split())
     process.wait()
     os.chdir("..")
     return df_algorithms
@@ -195,9 +195,8 @@ def kdeness_ckde():
     ax.set_xticklabels(df.index)
     ax.tick_params(axis='x', rotation=90)
 
-    # ax.legend(tuple([t[0] for t in b]), (r'$\lambda = 0$', r'$\lambda = 5$'))
     plt.legend([t[0] for t in b], algorithms)
-    tikzplotlib.save("plots/kdeness_spbn.tex", standalone=True, axis_width="25cm", axis_height="10cm")
+    tikzplotlib.save("plots/kdeness.tex", standalone=True, axis_width="25cm", axis_height="10cm")
 
 def datasets_table():
     files = experiments_helper.find_crossvalidation_datasets()
@@ -213,29 +212,17 @@ def datasets_table():
 
 if __name__ == '__main__':
     rename_dict = {
-        # 'SPBN_Validation_10_0': r'SPBN $\lambda = 0$',
-        # 'SPBN_Validation_10_5': r'SPBN $\lambda = 5$',
-        # 'SPBN_CKDE_Validation_10_0': r'SPBN HC $\lambda = 0$',
         'SPBN_CKDE_Validation_10_5': r'SPBN HC',
-        # 'KDEBN_0': r'KDEBN HC $\lambda = 0$',
         'KDEBN_5': r'KDEBN HC',
-        # 'GBN_Validation_10_0': r'GBN $\lambda = 0$',
-        # 'GBN_Validation_10_5': r'GBN $\lambda = 5$',
         'BIC': r'GBN BIC',
         'BGe': r'GBN BGe',
-        # 'SPBN_PC_LC_10_0': r'SPBN PC-PLC',
-        # 'SPBN_PC_LC_10_5': r'SPBN PC-PLC',
-        # 'SPBN_PC_RCOT_10_0': r'SPBN PC-RCoT',
-        # 'SPBN_PC_RCOT_10_5': r'SPBN PC-RCoT',
-        # 'SPBN_CKDE_PC_LC_10_0': r'SPBN PC-PLC',
         'SPBN_CKDE_PC_LC_10_5': r'SPBN PC-PLC',
-        # 'SPBN_CKDE_PC_RCOT_10_0': r'SPBN PC-RCoT',
         'SPBN_CKDE_PC_RCOT_10_5': r'SPBN PC-RCoT',
         'KDEBN_PC_LC': r'KDEBN PC-PLC',
         'KDEBN_PC_RCOT': r'KDEBN PC-RCoT',
         'GBN_PC_LC': r'GBN PC-PLC',
         'GBN_PC_RCOT': r'GBN PC-RCoT',
     }
+    
     # latex = plot_cd_diagrams(rename_dict)
-
     kdeness_ckde()

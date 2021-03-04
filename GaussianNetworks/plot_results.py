@@ -324,13 +324,13 @@ def plot_cd_diagrams(train_datasets, test_datasets, model_folders, true_models, 
     tikzplotlib.save("plots/Bergmann_spbn.tex", standalone=True, axis_width="16.5cm", axis_height="5cm")
 
     os.chdir("plots")
-    process = subprocess.Popen('pdflatex Nemenyi_spbn.tex'.split())
+    process = subprocess.Popen('pdflatex Nemenyi_Gaussian.tex'.split())
     process.wait()
-    process = subprocess.Popen('pdflatex Holm_spbn.tex'.split())
+    process = subprocess.Popen('pdflatex Holm_Gaussian.tex'.split())
     process.wait()
-    process = subprocess.Popen('pdflatex Bergmann_spbn.tex'.split())
+    process = subprocess.Popen('pdflatex Bergmann_Gaussian.tex'.split())
     process.wait()
-    process = subprocess.Popen('evince Bergmann_spbn.pdf'.split())
+    process = subprocess.Popen('evince Bergmann_Gaussian.pdf'.split())
     process.wait()
     os.chdir("..")
     return df_algorithms
