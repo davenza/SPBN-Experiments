@@ -315,13 +315,13 @@ def plot_cd_diagrams(train_datasets, test_datasets, model_folders, true_models, 
     names = [rename_dict[s] for s in names]
 
     plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="cd")
-    tikzplotlib.save("plots/Nemenyi_spbn.tex", standalone=True, axis_width="14cm", axis_height="5cm")
+    tikzplotlib.save("plots/Nemenyi_spbn.tex", standalone=True, axis_width="16.5cm", axis_height="5cm")
 
     plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="holm")
-    tikzplotlib.save("plots/Holm_spbn.tex", standalone=True, axis_width="14cm", axis_height="5cm")
+    tikzplotlib.save("plots/Holm_spbn.tex", standalone=True, axis_width="16.5cm", axis_height="5cm")
 
     plot_cd_diagram.graph_ranks(avgranks, names, df_algorithms.shape[0], posthoc_method="bergmann")
-    tikzplotlib.save("plots/Bergmann_spbn.tex", standalone=True, axis_width="14cm", axis_height="5cm")
+    tikzplotlib.save("plots/Bergmann_spbn.tex", standalone=True, axis_width="16.5cm", axis_height="5cm")
 
     os.chdir("plots")
     process = subprocess.Popen('pdflatex Nemenyi_spbn.tex'.split())
