@@ -511,6 +511,10 @@ def plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_
 
     offset = 0
 
+    HATCH_TYPE = '-'
+    import matplotlib as mpl
+    mpl.rcParams['hatch.linewidth'] = 5  # previous pdf hatch linewidth
+
     t = ax.bar(ind+width*offset, thd_hc_spbn[:,:, 1].reshape(-1), width, color=COLOR1, linewidth=0.5,
                    align='edge', edgecolor="black")
     offset += 1
@@ -520,7 +524,7 @@ def plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_
                    align='edge', edgecolor="black")
     offset += 1
     for bar in t:
-        bar.set_hatch('//')
+        bar.set_hatch(HATCH_TYPE)
     b.append(t)
 
     t = ax.bar(ind+width*offset, thd_pc_spbn[:,:,0,1].reshape(-1), width, color=COLOR2, linewidth=0.5,
@@ -532,7 +536,7 @@ def plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_
                    align='edge', edgecolor="black")
     offset += 1
     for bar in t:
-        bar.set_hatch('//')
+        bar.set_hatch(HATCH_TYPE)
     b.append(t)
 
     t = ax.bar(ind+width*offset, thd_pc_spbn[:,:,1,1].reshape(-1), width, color=COLOR3, linewidth=0.5,
@@ -544,7 +548,7 @@ def plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_
                    align='edge', edgecolor="black")
     offset += 1
     for bar in t:
-        bar.set_hatch('//')
+        bar.set_hatch(HATCH_TYPE)
     b.append(t)
 
     ax.set_ylabel('Node type Hamming distance')
