@@ -16,12 +16,12 @@ import tikzplotlib
 import adjusted_pvalues
 import experiments_helper
 
-def print_apv(avgranks, names, type="bergmann"):
+def print_apv(avgranks, N, names, type="bergmann"):
 
     if type == "bergmann":
-        apv = adjusted_pvalues.bergmann_hommel(avgranks, names)
+        apv = adjusted_pvalues.bergmann_hommel(avgranks, N, names)
     elif type == "holm":
-        apv = adjusted_pvalues.holm(avgranks, names)
+        apv = adjusted_pvalues.holm(avgranks, N, names)
 
     for (pvalue, (alg1, alg2)) in apv:
         print(alg1 + " vs " + alg2  + ": " + str(pvalue))
@@ -80,13 +80,13 @@ def plot_cd_diagrams(rename_dict):
     df_algorithms['GBN_PC_LC'] = df_pc_gbn['GBN_PC_LC']
     df_algorithms['GBN_PC_RCOT'] = df_pc_gbn['GBN_PC_RCOT']
 
-    df_algorithms = df_algorithms[df_algorithms['N'] < 500]
+    # df_algorithms = df_algorithms[df_algorithms['N'] < 500]
     df_algorithms = df_algorithms.drop('N', axis=1)
     rank = df_algorithms.rank(axis=1, ascending=False)
     avgranks = rank.mean().to_numpy()
     names = rank.columns.values
 
-    print_apv(avgranks, names)
+    print_apv(avgranks, df_algorithms.shape[0], names)
     input("Press [Enter]:")
 
     names = [rename_dict[s] for s in names]
@@ -224,5 +224,5 @@ if __name__ == '__main__':
         'GBN_PC_RCOT': r'GBN PC-RCoT',
     }
     
-    # latex = plot_cd_diagrams(rename_dict)
-    kdeness_ckde()
+    latex = plot_cd_diagrams(rename_dict)
+    # kdeness_ckde()

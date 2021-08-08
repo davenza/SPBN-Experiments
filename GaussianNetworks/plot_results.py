@@ -269,11 +269,11 @@ def plot_table(train_datasets, test_datasets, model_folders, true_models):
 
 
 
-def print_apv(avgranks, names, type="bergmann"):
+def print_apv(avgranks, N, names, type="bergmann"):
     if type == "bergmann":
-        apv = adjusted_pvalues.bergmann_hommel(avgranks, names)
+        apv = adjusted_pvalues.bergmann_hommel(avgranks, N, names)
     elif type == "holm":
-        apv = adjusted_pvalues.holm(avgranks, names)
+        apv = adjusted_pvalues.holm(avgranks, N, names)
 
     for (pvalue, (alg1, alg2)) in apv:
         print(alg1 + " vs " + alg2  + ": " + str(pvalue))
@@ -309,7 +309,7 @@ def plot_cd_diagrams(train_datasets, test_datasets, model_folders, true_models, 
     avgranks = rank.mean().to_numpy()
     names = rank.columns.values
 
-    print_apv(avgranks, names)
+    print_apv(avgranks, rank.shape[0], names)
     input("Press [Enter]:")
 
     names = [rename_dict[s] for s in names]
@@ -608,7 +608,7 @@ if __name__ == '__main__':
     }
 
     # plot_table(train_datasets, test_datasets, model_folders, true_models,)
-    # plot_cd_diagrams(train_datasets, test_datasets, model_folders, true_models, rename_dict)
-    plot_hmd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)
-    plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)
-    plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)
+    plot_cd_diagrams(train_datasets, test_datasets, model_folders, true_models, rename_dict)
+    # plot_hmd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)
+    # plot_shd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)
+    # plot_thd(train_datasets, test_datasets, model_folders, true_models, dataset_names, instance_names)

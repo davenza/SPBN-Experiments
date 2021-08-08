@@ -156,11 +156,11 @@ def graph_ranks(avranks, names, N, posthoc_method="cd", lowv=None, highv=None,
                           if abs(sums[i] - sums[j]) <= hsd]
 
             elif posthoc_method == "holm":
-                apv = adjusted_pvalues.holm(ssums, np.arange(k))
+                apv = adjusted_pvalues.holm(ssums, N, np.arange(k))
                 notSig = sorted([(i, j) for (p, (i, j)) in apv if p > alpha])
 
             elif posthoc_method == "bergmann":
-                apv = adjusted_pvalues.bergmann_hommel(ssums, np.arange(k))
+                apv = adjusted_pvalues.bergmann_hommel(ssums, N, np.arange(k))
                 notSig = sorted([(i, j) for (p, (i, j)) in apv if p > alpha])
 
             else:

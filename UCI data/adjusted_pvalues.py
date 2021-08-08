@@ -17,8 +17,8 @@ def nth(l, n):
     """
     return [a[n] for a in l]
 
-def holm(avgranks, names):
-    p_values = pvalues(avgranks)
+def holm(avgranks, N, names):
+    p_values = pvalues(avgranks, N)
     k = len(avgranks)
     m = k*(k-1) / 2
 
@@ -85,8 +85,8 @@ def correct_monotocity(p_values):
 
     return new_pvalues
 
-def bergmann_hommel(avgranks, names):
-    p_values = pvalues(avgranks)
+def bergmann_hommel(avgranks, N, names):
+    p_values = pvalues(avgranks, N)
 
     k = len(avgranks)
     exhaustive_sets = bh_exhaustivesets(np.arange(k))
@@ -106,9 +106,8 @@ def bergmann_hommel(avgranks, names):
     apv_names = [(p, (names[alg1], names[alg2])) for (p, (alg1, alg2)) in mon_apv]
     return apv_names
 
-def pvalues(avgranks):
+def pvalues(avgranks, N):
     k = len(avgranks)
-    N = 30
 
     z_values = {}
     p_values = []
@@ -142,7 +141,7 @@ if __name__ == "__main__":
     print()
     print("Bergmann Hommel")
     print("--------------------")
-    apv = bergmann_hommel(avgranks, names)
+    apv = bergmann_hommel(avgranks, rank.shape[0], names)
 
     print(apv)
     print()
@@ -153,7 +152,7 @@ if __name__ == "__main__":
     print()
     print("Holm")
     print("--------------------")
-    apv = holm(avgranks, names)
+    apv = holm(avgranks, N, names)
 
     print(apv)
     print()
